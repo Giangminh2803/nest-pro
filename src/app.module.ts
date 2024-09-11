@@ -9,6 +9,8 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { LocalAuthGuard } from './auth/local-auth.guard';
 import { JwtStrategy } from './auth/passport/jwt.strategy';
+import { softDeletePlugin } from 'soft-delete-plugin-mongoose';
+import { CompaniesModule } from './companies/companies.module';
 
 @Module({
   imports: [
@@ -16,6 +18,10 @@ import { JwtStrategy } from './auth/passport/jwt.strategy';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         uri: configService.get<string>('CONNECTION_STRING'),
+        connectionFactory: (connection) => {
+          connection.plugin(softDeletePlugin);
+          return connection;
+        }
       }),
       inject: [ConfigService],
     }),
@@ -23,7 +29,8 @@ import { JwtStrategy } from './auth/passport/jwt.strategy';
       isGlobal: true,
     }),
     UsersModule,
-    AuthModule
+    AuthModule,
+    CompaniesModule
   ],
   controllers: [AppController],
   //providers: [AppService],
