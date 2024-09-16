@@ -12,7 +12,9 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const reflector = app.get(Reflector);
   app.useGlobalGuards(new JwtAuthGuard(reflector));
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({
+    transform: true
+  }));
   app.useGlobalInterceptors(new TransformInterceptor(reflector));
   
   app.setGlobalPrefix('api')
