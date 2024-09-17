@@ -57,7 +57,7 @@ export class UsersService {
     }
     const hashPassword = this.hashPassword(registerUserDto.password);
     registerUserDto.password = hashPassword;
-    let newUser = await this.userModel.create({ ...registerUserDto})
+    let newUser = await this.userModel.create({ ...registerUserDto, role: "USER"})
     return {
       _id: newUser._id,
       createdAt: newUser.createdAt
@@ -110,6 +110,7 @@ export class UsersService {
 
 
 
+
   async update(updateUserDto: UpdateUserDto) {
 
     return await this.userModel.updateOne(
@@ -126,5 +127,15 @@ export class UsersService {
       } 
     })
     return await this.userModel.softDelete({ _id: id });
+  }
+
+  updatedUserToken = async (refreshToken: string, _id: string) => {
+    return await this.userModel.updateOne({_id}, {
+      refresh_token: refreshToken
+    })
+  }
+
+  findUserByToken = async (refreshToken: string) => {
+    return await this.userModel.findOne({refresh_token: refreshToken});
   }
 }

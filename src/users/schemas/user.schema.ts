@@ -27,6 +27,9 @@ export class User {
   address: string;
 
   @Prop()
+  role: string;
+
+  @Prop()
   refresh_token: string;
 
   @Prop({ type: Object })
