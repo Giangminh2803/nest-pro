@@ -28,11 +28,11 @@ export class CompaniesService {
     const { filter, sort, projection, population } = aqp(qs);
     delete filter.currentPage;
     delete filter.pageSize;
+    const defaultCurrentPage = currentPage ? currentPage : 1;
     const defaultPageSize = pageSize ? pageSize : 5;
     const totalDocument = (await this.companyModel.find(filter)).length;
-    let totalPage = Math.ceil(totalDocument / pageSize);
-    let skip = (currentPage - 1) * pageSize;
-
+    let totalPage = Math.ceil(totalDocument / defaultPageSize);
+    let skip = (defaultCurrentPage - 1) * defaultPageSize;
 
     const result = await this.companyModel.find(filter)
       .skip(skip)
@@ -44,8 +44,8 @@ export class CompaniesService {
 
     return {
       meta: {
-        currentPage: currentPage,
-        pageSize: pageSize,
+        currentPage: defaultCurrentPage,
+        pageSize: defaultPageSize,
         totalPage: totalPage,
         totalDocument: totalDocument
       },
