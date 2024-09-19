@@ -60,8 +60,10 @@ export class CompaniesService {
   }
 
   async update(updateCompanyDto: UpdateCompanyDto, user: IUser) {
+    const isIdExit = await this.companyModel.findById({ _id: updateCompanyDto._id });
     const isExist = await this.companyModel.findOne({ name: updateCompanyDto.name });
-    if (!isExist) {
+
+    if (isIdExit) {
       return await this.companyModel.updateOne({
         ...updateCompanyDto, updatedBy: {
           _id: user._id,
@@ -69,8 +71,12 @@ export class CompaniesService {
         }
 
       })
+    } else if (isExist) {
+      return `Company ${updateCompanyDto.name} has existed`;
     }
-    return `Company ${updateCompanyDto.name} has existed`;
+
+
+
   }
 
   async remove(id: string, user: IUser) {
