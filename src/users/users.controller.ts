@@ -1,8 +1,8 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, RegisterUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ResponseMessage, User } from 'src/decorator/customize';
+import { Public, ResponseMessage, User } from 'src/decorator/customize';
 import { IUser } from './user.interface';
 
 
@@ -17,6 +17,14 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
+  @Public()
+  @ResponseMessage('Register a user !')
+  @Post('/register')
+  register(@Body() registerUserDto: RegisterUserDto) {
+
+    return this.usersService.register(registerUserDto);
+  }
+
   @Get()
   @ResponseMessage('Fetch user with paginate!')
   findAll(
@@ -27,6 +35,7 @@ export class UsersController {
     return this.usersService.findAll(+currentPage, +pageSize, qs);
   }
 
+  @ResponseMessage('Fetch user by id!')
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);

@@ -12,6 +12,9 @@ export class User {
   password: string;
 
   @Prop()
+  idCard: string;
+
+  @Prop()
   name: string;
 
   @Prop()
@@ -32,11 +35,8 @@ export class User {
   @Prop()
   refresh_token: string;
 
-  @Prop({ type: Object })
-  company: {
-    _id: mongoose.Schema.Types.ObjectId;
-    name: string;
-  };
+  @Prop({ type: mongoose.Schema.Types.Array })
+  roomsRented: mongoose.Schema.Types.ObjectId[] ;
 
   @Prop()
   createdAt: Date;
