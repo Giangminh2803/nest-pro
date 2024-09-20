@@ -1,8 +1,5 @@
 import { Type } from "class-transformer";
 import { IsDefined, IsEmail, IsInt, IsNotEmpty, IsNotEmptyObject, IsNumber, IsObject, IsString, ValidateNested } from "class-validator"
-import mongoose from "mongoose";
-
-
 
 export class CreateUserDto {
     @IsString()
