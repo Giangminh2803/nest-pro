@@ -6,11 +6,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { softDeletePlugin } from 'soft-delete-plugin-mongoose';
-
 import { FilesModule } from './files/files.module';
 import { ServicesModule } from './services/services.module';
 import { EquipmentsModule } from './equipments/equipments.module';
 import { RoomsModule } from './rooms/rooms.module';
+import { BillsModule } from './bills/bills.module';
 
 @Module({
   imports: [
@@ -33,10 +33,11 @@ import { RoomsModule } from './rooms/rooms.module';
     FilesModule,
     ServicesModule,
     EquipmentsModule,
-    RoomsModule
+    RoomsModule,
+    BillsModule
   ],
   controllers: [AppController],
-  //providers: [AppService],
+
   providers: [
     AppService,
     
