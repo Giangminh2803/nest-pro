@@ -37,6 +37,7 @@ export class BillsController {
     return this.billsService.update(id, updateBillDto, user);
   }
 
+  @ResponseMessage('Soft-delete a Bill!')
   @Delete(':id')
   remove(@Param('id') id: string, @User() user: IUser) {
     return this.billsService.remove(id, user);

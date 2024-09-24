@@ -11,6 +11,7 @@ import { ServicesModule } from './services/services.module';
 import { EquipmentsModule } from './equipments/equipments.module';
 import { RoomsModule } from './rooms/rooms.module';
 import { BillsModule } from './bills/bills.module';
+import { ContractsModule } from './contracts/contracts.module';
 
 @Module({
   imports: [
@@ -34,7 +35,8 @@ import { BillsModule } from './bills/bills.module';
     ServicesModule,
     EquipmentsModule,
     RoomsModule,
-    BillsModule
+    BillsModule,
+    ContractsModule
   ],
   controllers: [AppController],
 
