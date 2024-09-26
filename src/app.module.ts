@@ -12,6 +12,8 @@ import { EquipmentsModule } from './equipments/equipments.module';
 import { RoomsModule } from './rooms/rooms.module';
 import { BillsModule } from './bills/bills.module';
 import { ContractsModule } from './contracts/contracts.module';
+import { PermissionModule } from './permission/permission.module';
+import { RoleModule } from './role/role.module';
 
 @Module({
   imports: [
@@ -36,7 +38,9 @@ import { ContractsModule } from './contracts/contracts.module';
     EquipmentsModule,
     RoomsModule,
     BillsModule,
-    ContractsModule
+    ContractsModule,
+    PermissionModule,
+    RoleModule
   ],
   controllers: [AppController],
 
