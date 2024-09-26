@@ -1,56 +1,53 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto, RegisterUserDto } from './dto/create-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import mongoose from 'mongoose';
 import { Public, ResponseMessage, User } from 'src/decorator/customize';
 import { IUser } from './user.interface';
-
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
-  @ResponseMessage('Create a user !')
+  
+  @ResponseMessage('Create a new user')
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
+  create(
+    @Body() createUserDto: CreateUserDto,
+    @User() user: IUser
+  ) {
+      return this.usersService.create(createUserDto ,user);
 
-    return this.usersService.create(createUserDto);
-  }
-
-  @Public()
-  @ResponseMessage('Register a user !')
-  @Post('/register')
-  register(@Body() registerUserDto: RegisterUserDto) {
-
-    return this.usersService.register(registerUserDto);
   }
 
   @Get()
-  @ResponseMessage('Fetch user with paginate!')
   findAll(
-    @Query('currentPage') currentPage: string,
-    @Query('pageSize') pageSize: string,
+    @Query("current") currentPage: string,
+    @Query("pageSize") limit: string,
     @Query() qs: string
   ) {
-    return this.usersService.findAll(+currentPage, +pageSize, qs);
+    return this.usersService.findAll(+currentPage, +limit, qs);
   }
 
-  @ResponseMessage('Fetch user by id!')
+  @Public()
   @Get(':id')
   findOne(@Param('id') id: string) {
+    if(!mongoose.Types.ObjectId.isValid(id))
+      return "not found user"
     return this.usersService.findOne(id);
+   
   }
 
-
-  @ResponseMessage('Update a user !')
-  @Patch()
-  update(@Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(updateUserDto);
+  @Patch(':id')
+  @ResponseMessage('Update a new user')
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @User() user: IUser) {
+    return this.usersService.update(id, updateUserDto, user);
   }
 
-  
-  @ResponseMessage('Delete a user!')
+ 
   @Delete(':id')
+  @ResponseMessage('Delete a new user')
   remove(@Param('id') id: string, @User() user: IUser) {
     return this.usersService.remove(id, user);
   }

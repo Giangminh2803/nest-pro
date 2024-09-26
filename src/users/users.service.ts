@@ -3,139 +3,160 @@ import { CreateUserDto, RegisterUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { Model } from 'mongoose';
+import { USER_ROLE } from 'src/databases/sample';
 import { compareSync, genSaltSync, hashSync } from 'bcryptjs';
 import { SoftDeleteModel } from "soft-delete-plugin-mongoose";
 import { IUser } from './user.interface';
 import aqp from 'api-query-params';
+import { Role, RoleDocument } from 'src/role/schemas/role.schema';
 
 @Injectable()
 export class UsersService {
-
-  constructor(@InjectModel(User.name) private userModel: SoftDeleteModel<UserDocument>) { }
+  constructor(@InjectModel(User.name) private userModel: SoftDeleteModel<UserDocument>,
+    @InjectModel(Role.name) private roleModel: SoftDeleteModel<RoleDocument>
+  ) { }
 
   hashPassword = (password: string) => {
-    let salt = genSaltSync(10);
-    let hashPassword = hashSync(password, salt);
-    return hashPassword;
+    const salt = genSaltSync(10);
+    const hash = hashSync(password, salt);
+    return hash;
   }
 
-  isValidPassword = (password: string, hash: string) => {
-    return compareSync(password, hash);
+  isEmailExist = async (email: string) => {
+    const isExist = await this.userModel.findOne({ email });
+    if (isExist) {
+
+      return true;
+    } else {
+      return false;
+    }
   }
-
-   isExistEmail = async (email: string) => {
-     const isExistEmail = await this.userModel.findOne({email: email});
-     return isExistEmail
-    
-  }
-
-  async create(createUserDto: CreateUserDto) {
-    const isExistEmail =await this.isExistEmail(createUserDto.email);
-    if(isExistEmail){
-      
-      throw new BadRequestException( `Email: ${createUserDto.email} has existed` , { cause: new Error(), description:'Register Fail' })
-
-       ;
+  async create(createUserDto: CreateUserDto, user: IUser) {
+    if (await this.isEmailExist(createUserDto.email)) {
+      throw new BadRequestException(`Email: ${createUserDto.email} is exist`);
     }
     const hashPassword = this.hashPassword(createUserDto.password);
     createUserDto.password = hashPassword;
-    let newUser = await this.userModel.create({ ...createUserDto })
+    let data = await this.userModel.create(
+      {
+        ...createUserDto, createdBy: {
+          _id: user._id,
+          email: user.email
+        }
+      }
+    );
     return {
-      _id: newUser._id,
-      createdAt: newUser.createdAt
-    };
+      _id: data?._id,
+      createdAt: data?.createdAt
+    }
+
+
   }
 
   async register(registerUserDto: RegisterUserDto) {
-    const isExistEmail =await this.isExistEmail(registerUserDto.email);
-    if(isExistEmail){
-      
-      throw new BadRequestException( `Email: ${registerUserDto.email} has existed` , { cause: new Error(), description:'Register Fail' })
-
-       ;
-    }
+    const userRole = await this.roleModel.findOne({ name: USER_ROLE });
     const hashPassword = this.hashPassword(registerUserDto.password);
-    registerUserDto.password = hashPassword;
-    let newUser = await this.userModel.create({ ...registerUserDto, role: "USER"})
-    return {
-      _id: newUser._id,
-      createdAt: newUser.createdAt
-    };
-  }
+    let { name, email, age, gender, address } = registerUserDto;
 
-  async findAll(currentPage: number, pageSize: number, qs: string) {
-    const { filter, sort, projection, population } = aqp(qs);
-    delete filter.currentPage;
-    delete filter.pageSize;
-    const defaultCurrentPage = currentPage ? currentPage : 1;
-    const defaultPageSize = pageSize ? pageSize : 5;
-    const totalDocument = (await this.userModel.find(filter)).length;
-    let totalPage = Math.ceil(totalDocument / defaultPageSize);
-    let skip = (defaultCurrentPage - 1) * pageSize;
-
-
-    const result = await this.userModel.find(filter)
-      .skip(skip)
-      .limit(defaultPageSize)
-      .sort(sort as any)
-      .select(projection)
-      .populate(population)
-      .exec()
-
-    return {
-      meta: {
-        currentPage: defaultCurrentPage,
-        pageSize: defaultPageSize,
-        totalPage: totalPage,
-        totalDocument: totalDocument
-      },
-      result
-    }
-
-  }
-
-  async findOne(id: string) {
-    if (!mongoose.Types.ObjectId.isValid(id))
-      return `not found user by id: ${id}`;
-    const user = await this.userModel.findOne({ _id: id }).select('-password');
+    let user = await this.userModel.create(
+      {
+        name, email, password: hashPassword,
+        age,
+        gender,
+        address,
+        role: userRole?._id
+      }
+    )
     return user;
   }
 
-  async findOneByUsername(username: string) {
-    return await this.userModel.findOne({
+  async findAll(currentPage: number, limit: number, qs: string) {
+    const { filter, sort, projection, population } = aqp(qs);
+    delete filter.current;
+    delete filter.pageSize;
+    let skip = (currentPage - 1) * limit;
+    let defaultLimit = limit ? limit : 10;
+    const totalItem = (await this.userModel.find(filter)).length;
+    const totalPages = Math.ceil(totalItem / defaultLimit)
+    let result = await this.userModel.find(filter)
+      .skip(skip)
+      .limit(defaultLimit)
+      .sort(sort as any)
+      .select("-password")
+      .populate(population)
+      .exec();
+
+    return {
+      meta: {
+        crurent: currentPage,
+        pageSize: limit,
+        pages: totalPages,
+        total: totalItem
+      },
+      result
+    };
+  }
+
+  findOne(id: string) {
+    return this.userModel.findOne({
+      _id: id
+    }).select("-password")
+      .populate({ path: 'role', select: { name: 1, _id: 1 } })
+      ;
+  }
+
+  findOneByUsername(username: string) {
+    return this.userModel.findOne({
       email: username
+    })
+      .populate({ path: "role", select: { name: 1} })
+      ;
+  }
+
+  isValidPassword(password: string, hashPassword: string) {
+    return compareSync(password, hashPassword);
+  }
+
+  async update(id: string, updateUserDto: UpdateUserDto, user: IUser) {
+    return await this.userModel.updateOne({
+      _id: id
+    }, {
+      ...updateUserDto,
+      updatedBy: {
+        _id: user._id,
+        email: user.email
+      }
     });
   }
 
-
-
-
-  async update(updateUserDto: UpdateUserDto) {
-
-    return await this.userModel.updateOne(
-      { _id: updateUserDto._id },
-      { ...updateUserDto },
-      { $exists: true });
-  }
-
   async remove(id: string, user: IUser) {
-    await this.userModel.updateOne({_id:id}, {
+    const foundUser = await this.userModel.findById(id);
+    if (foundUser && foundUser.email === "admin@gmail.com") {
+      throw new BadRequestException("Can not delete account Admin");
+    }
+    await this.userModel.updateOne({
+      _id: id
+    }, {
       deletedBy: {
         _id: user._id,
-        email: user.email
-      } 
+        email: user._id
+      }
     })
-    return await this.userModel.softDelete({ _id: id });
+    return await this.userModel.softDelete({
+      _id: id
+    });
+
   }
 
-  updatedUserToken = async (refreshToken: string, _id: string) => {
-    return await this.userModel.updateOne({_id}, {
-      refresh_token: refreshToken
+  updateUserToken = async (refresh_Token: string, _id: string) => {
+    return await this.userModel.updateOne({ _id }, { refresh_Token })
+    .populate({
+      path: "role",
+      select: {name: 1}
     })
   }
 
-  findUserByToken = async (refreshToken: string) => {
-    return await this.userModel.findOne({refresh_token: refreshToken});
+  findUserByToken = async (refresh_Token: string) => {
+    return await this.userModel.findOne({ refresh_token: refresh_Token })
   }
 }

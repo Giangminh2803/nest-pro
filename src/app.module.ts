@@ -14,6 +14,7 @@ import { BillsModule } from './bills/bills.module';
 import { ContractsModule } from './contracts/contracts.module';
 import { PermissionModule } from './permission/permission.module';
 import { RoleModule } from './role/role.module';
+import { DatabasesModule } from './databases/databases.module';
 
 @Module({
   imports: [
@@ -40,7 +41,8 @@ import { RoleModule } from './role/role.module';
     BillsModule,
     ContractsModule,
     PermissionModule,
-    RoleModule
+    RoleModule,
+    DatabasesModule
   ],
   controllers: [AppController],
 
