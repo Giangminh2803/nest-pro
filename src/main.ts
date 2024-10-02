@@ -12,9 +12,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const reflector = app.get(Reflector);
   app.useGlobalGuards(new JwtAuthGuard(reflector));
-  app.useGlobalPipes(new ValidationPipe({
-    transform: true
-  }));
+  app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new TransformInterceptor(reflector));
 
   app.setGlobalPrefix('api')
@@ -25,6 +23,12 @@ async function bootstrap() {
   });
 
   app.use(cookieParser());
+  app.enableCors({
+    "origin": true,
+    "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+    "preflightContinue": false,
+    credentials: true
+  });
   await app.listen(configService.get<string>('PORT'));
 }
 bootstrap();

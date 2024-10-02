@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsDefined, IsEmail, IsInt, IsNotEmpty, IsNotEmptyObject, IsNumber, IsObject, IsString, ValidateNested } from "class-validator"
+import { IsEmail, IsInt, IsNotEmpty, IsNotEmptyObject, IsNumber, IsObject, IsOptional, IsString, Length, Min, ValidateNested } from "class-validator"
 
 export class CreateUserDto {
     @IsString()
@@ -31,19 +31,21 @@ export class CreateUserDto {
 }
 
 export class RegisterUserDto {
+    
     @IsString()
+    @IsNotEmpty({message: 'Email is invalid'})
     @IsEmail()
-    @IsNotEmpty()
     email: string
 
     @IsString()
     @IsNotEmpty()
+    @Length(6, 20)
     password: string
 
     @IsString()
     name: string
 
-    @Type(() => Number)
+    
     @IsNotEmpty()
     @IsInt()
     age: number
@@ -54,8 +56,10 @@ export class RegisterUserDto {
     @IsString()
     address: string
 
-    @IsString()
-    idCard: string
+    @IsNumber()
+    @Length(12)
+    @IsOptional()
+    idCard: number
 
 
 }

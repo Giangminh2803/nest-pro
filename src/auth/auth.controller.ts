@@ -32,8 +32,8 @@ export class AuthController {
   @Public()
   @ResponseMessage('Register a user success')
   @Post('/register')
-  handleRegister(@Body() userData) {
-      return this.authService.register(userData);
+  handleRegister(@Body() registerUserDto: RegisterUserDto) {
+      return this.authService.register(registerUserDto);
   }
 
   
