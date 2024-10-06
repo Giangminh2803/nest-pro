@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsEmail, IsInt, IsNotEmpty, IsNotEmptyObject, IsNumber, IsObject, IsOptional, IsString, Length, Min, ValidateNested } from "class-validator"
+import { IsEmail, IsInt, IsNotEmpty, IsNotEmptyObject, IsNumber, IsNumberString, IsObject, IsOptional, IsString, Length, Min, ValidateNested } from "class-validator"
 
 export class CreateUserDto {
     @IsString()
@@ -25,6 +25,7 @@ export class CreateUserDto {
     address: string
 
     @IsString()
+    @IsOptional()
     role: string
 
     
@@ -47,7 +48,7 @@ export class RegisterUserDto {
 
     
     @IsNotEmpty()
-    @IsInt()
+    @IsNumberString()
     age: number
 
     @IsString()

@@ -149,7 +149,7 @@ export class UsersService {
   }
 
   updateUserToken = async (refresh_Token: string, _id: string) => {
-    return await this.userModel.updateOne({ _id }, { refresh_Token })
+    return await this.userModel.updateOne({ _id }, {refresh_token: refresh_Token })
     .populate({
       path: "role",
       select: {name: 1}
@@ -157,6 +157,9 @@ export class UsersService {
   }
 
   findUserByToken = async (refresh_Token: string) => {
-    return await this.userModel.findOne({ refresh_token: refresh_Token })
+    return (await this.userModel.findOne({ refresh_token: refresh_Token })).populate({
+      path: 'role',
+      select: {name: 1}
+    })
   }
 }

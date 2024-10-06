@@ -39,7 +39,7 @@ export class User {
   refresh_token: string;
 
   @Prop({ type: [mongoose.Schema.Types.Array], ref: Room.name })
-  roomsRented:Room[] ;
+  roomsRented:Room[];
 
   @Prop()
   createdAt: Date;
