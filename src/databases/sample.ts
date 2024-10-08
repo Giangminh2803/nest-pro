@@ -545,4 +545,24 @@ export const INIT_PERMISSION = [
 		"updatedBy": {}
 	
 	}, //Fetch data Contracts for User with paginate
+
+	{
+			
+		"name": "Get Role",
+		"apiPath": "/api/v1/roles",
+		"method": "GET",
+		"module": "Role",
+		"createdBy":{
+			"_id": "",
+			"email": "admin@gmail.com"
+		},
+		"isDeleted": false,
+		"deletedAt": null,
+		"createdAt": "2024-08-17T04:41:40.369Z",
+		"updatedAt": "",
+		"__v": 0,
+		"updatedBy": {}
+	
+	}, //Get Role
+
 ]

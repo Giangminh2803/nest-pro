@@ -24,8 +24,7 @@ export class UsersService {
 
   isEmailExist = async (email: string) => {
     const isExist = await this.userModel.findOne({ email });
-    if (isExist) {
-
+    if (isExist && isExist.isDeleted) {
       return true;
     } else {
       return false;
@@ -82,7 +81,7 @@ export class UsersService {
       .skip(skip)
       .limit(defaultLimit)
       .sort(sort as any)
-      .select("-password")
+      .select(["-password", "-refresh_token"])
       .populate(population)
       .exec();
 

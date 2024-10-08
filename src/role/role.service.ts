@@ -35,8 +35,9 @@ export class RoleService {
     const { filter, sort, projection, population } = aqp(qs);
     delete filter.current;
     delete filter.pageSize;
-    let skip = (currentPage - 1) * limit;
-    let defaultLimit = limit ? limit : 10;
+    let defaultCurrent = currentPage ? currentPage : 1;
+    let defaultLimit = limit ? limit : 99;
+    let skip = (defaultCurrent - 1) * defaultLimit;
     const totalItem = (await this.roleModel.find(filter)).length;
     const totalPages = Math.ceil(totalItem / defaultLimit)
     let result = await this.roleModel.find(filter)
@@ -50,8 +51,8 @@ export class RoleService {
 
     return  {
       meta: {
-        crurent: currentPage,
-        pageSize: limit,
+        current: defaultCurrent,
+        pageSize: defaultLimit,
         pages: totalPages,
         total: totalItem
       },
