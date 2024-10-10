@@ -26,14 +26,14 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   handleRequest(err, user, info, context: ExecutionContext) {
-    const reqest: Request = context.switchToHttp().getRequest();
+    const request: Request = context.switchToHttp().getRequest();
     // You can throw an exception based on either "info" or "err" arguments
     if (err || !user) {
       throw err || new UnauthorizedException('Token is invalid');
     }
 
-    const targetMethod = reqest.method;
-    const targetEndpoint = reqest.route?.path as string;
+    const targetMethod = request.method;
+    const targetEndpoint = request.route?.path as string;
     const permissions = user?.permissions ?? [];
 
     let isExist = permissions.find(

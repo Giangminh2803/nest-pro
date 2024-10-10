@@ -3,7 +3,7 @@ export const USER_ROLE = "NORMAL USER";
 export const INIT_PERMISSION = [
 	{
 
-		"name": "Create a User",
+		"name": "Register a User",
 		"apiPath": "/api/v1/users/register",
 		"method": "POST",
 		"module": "User",
@@ -18,7 +18,25 @@ export const INIT_PERMISSION = [
 		"__v": 0,
 		"updatedBy": {}
 
-	}, //Create a User
+	}, //Register a User
+	{
+
+		"name": "Create a User",
+		"apiPath": "/api/v1/users",
+		"method": "POST",
+		"module": "User",
+		"createdBy": {
+			"_id": "",
+			"email": "admin@gmail.com"
+		},
+		"isDeleted": false,
+		"deletedAt": null,
+		"createdAt": "2024-08-17T04:41:40.369Z",
+		"updatedAt": "",
+		"__v": 0,
+		"updatedBy": {}
+
+	}, //Register a User
 	{
 
 		"name": "Get user by Id",
@@ -568,7 +586,7 @@ export const INIT_PERMISSION = [
 
 		"name": "Update Role",
 		"apiPath": "/api/v1/roles/:id",
-		"method": "UPDATE",
+		"method": "PATCH",
 		"module": "Role",
 		"createdBy": {
 			"_id": "",
@@ -618,12 +636,29 @@ export const INIT_PERMISSION = [
 		"updatedBy": {}
 
 	}, //Fetch Roles with paginate
+	{
 
+		"name": "Create Permission",
+		"apiPath": "/api/v1/permissions",
+		"method": "POST",
+		"module": "Permission",
+		"createdBy": {
+			"_id": "",
+			"email": "admin@gmail.com"
+		},
+		"isDeleted": false,
+		"deletedAt": null,
+		"createdAt": "2024-08-17T04:41:40.369Z",
+		"updatedAt": "",
+		"__v": 0,
+		"updatedBy": {}
+
+	}, //Update Role
 	{
 
 		"name": "Update Permission",
 		"apiPath": "/api/v1/permissions/:id",
-		"method": "UPDATE",
+		"method": "PATCH",
 		"module": "Permission",
 		"createdBy": {
 			"_id": "",

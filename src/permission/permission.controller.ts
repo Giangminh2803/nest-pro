@@ -2,13 +2,14 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestj
 import { PermissionService } from './permission.service';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
-import { User } from 'src/decorator/customize';
+import { ResponseMessage, User } from 'src/decorator/customize';
 import { IUser } from 'src/users/user.interface';
 
 @Controller('permissions')
 export class PermissionController {
   constructor(private readonly permissionService: PermissionService) {}
 
+  @ResponseMessage('Successfully created permissions')
   @Post()
   create(@Body() createPermissionDto: CreatePermissionDto, @User() user: IUser) {
     return this.permissionService.create(createPermissionDto, user);
@@ -28,6 +29,7 @@ export class PermissionController {
     return this.permissionService.findOne(id);
   }
 
+  @ResponseMessage('Updated successfully!')
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePermissionDto: UpdatePermissionDto, @User() user: IUser) {
     return this.permissionService.update(id, updatePermissionDto, user);
