@@ -1,5 +1,6 @@
 import { Type } from "class-transformer";
 import { IsEmail, IsInt, IsNotEmpty, IsNotEmptyObject, IsNumber, IsNumberString, IsObject, IsOptional, IsString, Length, Min, ValidateNested } from "class-validator"
+import mongoose from "mongoose";
 
 export class CreateUserDto {
     @IsString()
@@ -26,7 +27,7 @@ export class CreateUserDto {
 
     @IsString()
     @IsOptional()
-    role: string
+    role: mongoose.Schema.Types.ObjectId
 
     
 }

@@ -138,7 +138,7 @@ export class UsersService {
     }, {
       deletedBy: {
         _id: user._id,
-        email: user._id
+        email: user.email
       }
     })
     return await this.userModel.softDelete({

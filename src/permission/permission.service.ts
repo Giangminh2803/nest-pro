@@ -35,8 +35,9 @@ export class PermissionService {
     const { filter, sort, projection, population } = aqp(qs);
     delete filter.current;
     delete filter.pageSize;
-    let skip = (currentPage - 1) * limit;
+    let defaultCurrentPage = currentPage ? currentPage : 1;
     let defaultLimit = limit ? limit : 10;
+    let skip = (defaultCurrentPage - 1) * limit;
     const totalItem = (await this.permissionModel.find(filter)).length;
     const totalPages = Math.ceil(totalItem / defaultLimit)
     let result = await this.permissionModel.find(filter)
@@ -50,8 +51,8 @@ export class PermissionService {
 
     return  {
       meta: {
-        crurent: currentPage,
-        pageSize: limit,
+        current: defaultCurrentPage,
+        pageSize: defaultLimit,
         pages: totalPages,
         total: totalItem
       },
