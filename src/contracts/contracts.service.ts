@@ -21,6 +21,7 @@ export class ContractsService {
     }
     const contract = await this.contractModel.create({
       ...createContractDto,
+      innkeeperId: user._id,
       createdBy: {
         _id: user._id,
         email: user.email,
@@ -65,53 +66,33 @@ export class ContractsService {
 
   }
 
-  async findForUser(user: IUser, currentPage: number, pageSize: number, qs: string) {
-    const { filter, sort, projection, population } = aqp(qs);
-    delete filter.currentPage;
-    delete filter.pageSize;
-    const defaultCurrentPage = currentPage ? currentPage : 1;
-    const defaultPageSize = pageSize ? pageSize : 5;
-    const totalDocument = (await this.contractModel.find({tenantId: user._id})).length;
-    let totalPage = Math.ceil(totalDocument / defaultPageSize);
-    let skip = (defaultCurrentPage - 1) * pageSize;
+  async findByTenantId(id: string){
+    if (!mongoose.isValidObjectId(id)) {
+      throw new BadRequestException('Id is not valid!')
+    }
+    return await this.contractModel.find({tenantId: id})
 
-
-    const result = await this.contractModel.find({tenantId: user._id})
-      .skip(skip)
-      .limit(defaultPageSize)
-      .sort(sort as any)
-      .select(projection)
-      .populate(population)
-      .exec()
-
-    return {
-      meta: {
-        currentPage: defaultCurrentPage,
-        pageSize: defaultPageSize,
-        totalPage: totalPage,
-        totalDocument: totalDocument
-      },
-      result
-    };
   }
-
- 
-
+  
   async update(id: string, updateContractDto: UpdateContractDto, user: IUser) {
     if (!mongoose.isValidObjectId(id)) {
       throw new BadRequestException('Id is not valid!')
     }
 
-    return await this.contractModel.updateOne({ _id: id }, {
-      ...updateContractDto,
-      updatedBy: {
-        _id: user._id,
-        email: user.email,
-        name: user.name
-
-      },
+    const isExist = await this.contractModel.findOne({_id: id, isDeleted: false});
+    if(isExist){
+      return await this.contractModel.updateOne({ _id: id }, {
+        ...updateContractDto,
+        updatedBy: {
+          _id: user._id,
+          email: user.email,
+          name: user.name
   
-    });
+        },
+    
+      });
+    }
+    throw new BadRequestException('Something wrong!!!');
   }
 
   async remove(id: string, user: IUser) {

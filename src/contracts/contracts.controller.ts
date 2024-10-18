@@ -25,15 +25,13 @@ export class ContractsController {
     return this.contractsService.findAll(+currentPage, +pageSize, qs);
   }
 
-  @Get('for-user')
-  findForUser(
-    @User() user: IUser,
-    @Query('currentPage') currentPage: string,
-    @Query('pageSize') pageSize: string,
-    @Query() qs: string
-  ) {
-    return this.contractsService.findForUser(user, +currentPage, +pageSize, qs);
+  @ResponseMessage('Fetch data Contracts by Tenant!')
+  @Post("/by-tenant/:id")
+  findAllByTenant(@Param('id') id: string) {
+    return this.contractsService.findByTenantId(id);
   }
+
+ 
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateContractDto: UpdateContractDto, @User() user: IUser) {

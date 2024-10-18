@@ -1,16 +1,18 @@
 import { Type } from "class-transformer";
-import { isDate, IsDateString, IsDefined, IsEmail, IsInt, IsNotEmpty, IsNotEmptyObject, IsNumber, IsNumberString, IsObject, IsString, ValidateNested } from "class-validator"
+import { isDate, IsDateString, IsDefined, IsEmail, IsInt, IsNotEmpty, IsNotEmptyObject, IsNumber, IsNumberString, IsObject, IsOptional, IsString, ValidateNested } from "class-validator"
 
 
 
 export class CreateEquipmentDto {
 
     @IsString()
-    equipmentName: string;
+    name: string;
 
     @IsString()
+    @IsOptional()
     status: string;
 
-    @IsNumberString()
+    @IsNumber()
+    @IsOptional()
     price: number;
 }

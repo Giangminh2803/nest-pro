@@ -54,13 +54,13 @@ export class UsersService {
 
   async register(registerUserDto: RegisterUserDto) {
     const userRole = await this.roleModel.findOne({ name: USER_ROLE });
-    
-    let { name, email, age, gender, address } = registerUserDto;
+
+    let { name, email, birthday, gender, address } = registerUserDto;
     const hashPassword = this.hashPassword(registerUserDto.password);
     let user = await this.userModel.create(
       {
         name, email, password: hashPassword,
-        age,
+        birthday,
         gender,
         address,
         role: userRole?._id
@@ -73,10 +73,11 @@ export class UsersService {
     const { filter, sort, projection, population } = aqp(qs);
     delete filter.current;
     delete filter.pageSize;
-    let skip = (currentPage - 1) * limit;
+    let defaultCurrent = currentPage ? currentPage : 1;
+    let skip = (defaultCurrent - 1) * limit;
     let defaultLimit = limit ? limit : 10;
     const totalItem = (await this.userModel.find(filter)).length;
-    const totalPages = Math.ceil(totalItem / defaultLimit)
+    const totalPages = Math.ceil(totalItem / defaultLimit);
     let result = await this.userModel.find(filter)
       .skip(skip)
       .limit(defaultLimit)
@@ -87,8 +88,8 @@ export class UsersService {
 
     return {
       meta: {
-        crurent: currentPage,
-        pageSize: limit,
+        current: defaultCurrent,
+        pageSize: defaultLimit,
         pages: totalPages,
         total: totalItem
       },
@@ -108,7 +109,7 @@ export class UsersService {
     return this.userModel.findOne({
       email: username
     })
-      .populate({ path: "role", select: { name: 1} })
+      .populate({ path: "role", select: { name: 1 } })
       ;
   }
 
@@ -148,17 +149,27 @@ export class UsersService {
   }
 
   updateUserToken = async (refresh_Token: string, _id: string) => {
-    return await this.userModel.updateOne({ _id }, {refresh_token: refresh_Token })
-    .populate({
-      path: "role",
-      select: {name: 1}
-    })
+    return await this.userModel.updateOne({ _id }, { refresh_token: refresh_Token })
+      .populate({
+        path: "role",
+        select: { name: 1 }
+      })
   }
 
   findUserByToken = async (refresh_Token: string) => {
     return (await this.userModel.findOne({ refresh_token: refresh_Token })).populate({
       path: 'role',
-      select: {name: 1}
+      select: { name: 1 }
     })
+  }
+
+  findUserByRole = async () => {
+
+    const userRole = await this.roleModel.findOne({ name: USER_ROLE });
+
+    const users = await this.userModel.find({ role: userRole?._id }).select('-password');
+
+    return users;
+
   }
 }

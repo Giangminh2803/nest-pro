@@ -1,12 +1,13 @@
 import { Type } from "class-transformer";
-import { IsDefined, IsEmail, IsInt, IsNotEmpty, IsNotEmptyObject, IsNumber, IsNumberString, IsObject, IsString, ValidateNested } from "class-validator"
+import { IsDefined, IsEmail, IsInt, IsNotEmpty, IsNotEmptyObject, IsNumber, IsNumberString, IsObject, IsOptional, IsString, ValidateNested } from "class-validator"
 
 export class CreateRoomDto {
     @IsString()
-    roomNumber: string;
+    roomName: string;
 
     @IsString()
-    location: string;
+    @IsOptional()
+    type: string;
 
     @IsString()
     status: string;

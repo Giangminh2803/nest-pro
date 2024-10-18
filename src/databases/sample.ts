@@ -547,9 +547,9 @@ export const INIT_PERMISSION = [
 	}, //Fetch data Contracts with paginate
 	{
 
-		"name": "Fetch data Contracts for User with paginate",
-		"apiPath": "/api/v1/contracts/for-user",
-		"method": "GET",
+		"name": "Fetch data Contracts for Tenant",
+		"apiPath": "/api/v1/contracts/by-tenant/:id",
+		"method": "POST",
 		"module": "Contract",
 		"createdBy": {
 			"_id": "",

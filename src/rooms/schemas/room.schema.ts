@@ -6,13 +6,10 @@ export type RoomDocument = HydratedDocument<Room>;
 @Schema({ timestamps: true })
 export class Room {
   @Prop()
-  roomNumber: string;
+  roomName: string;
 
   @Prop()
-  location: string;
-
-  @Prop()
-  area: number;
+  type: string;
 
   @Prop()
   status: string;
@@ -20,14 +17,8 @@ export class Room {
   @Prop()
   price: number;
 
-  @Prop({type: mongoose.Schema.Types.ObjectId})
-  tenant: mongoose.Schema.Types.ObjectId;
-
   @Prop()
   description: string;
-
-  @Prop({ type: mongoose.Schema.Types.Array })
-  services: mongoose.Schema.Types.ObjectId[] ;
 
   @Prop({ type: mongoose.Schema.Types.Array })
   equipments : mongoose.Schema.Types.ObjectId[] ;

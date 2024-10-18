@@ -3,7 +3,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import mongoose from 'mongoose';
-import { Public, ResponseMessage, User } from 'src/decorator/customize';
+import { Public, RESPONSE_MESSAGE, ResponseMessage, User } from 'src/decorator/customize';
 import { IUser } from './user.interface';
 
 @Controller('users')
@@ -11,14 +11,13 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
   
-  @ResponseMessage('Create a new user')
+  @ResponseMessage('Create a new user by Admin')
   @Post()
   create(
     @Body() createUserDto: CreateUserDto,
     @User() user: IUser
   ) {
       return this.usersService.create(createUserDto ,user);
-
   }
 
   @Get()
@@ -39,6 +38,7 @@ export class UsersController {
    
   }
 
+
   @Patch(':id')
   @ResponseMessage('Update a new user')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @User() user: IUser) {
@@ -47,7 +47,7 @@ export class UsersController {
 
  
   @Delete(':id')
-  @ResponseMessage('Delete a new user')
+  @ResponseMessage('Soft-delete a new user')
   remove(@Param('id') id: string, @User() user: IUser) {
     return this.usersService.remove(id, user);
   }

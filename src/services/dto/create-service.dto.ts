@@ -15,4 +15,7 @@ export class CreateServiceDto {
     @IsString()
     unit: string;
 
+    @IsString()
+    type: string;
+
 }

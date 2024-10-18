@@ -1,5 +1,5 @@
 
-import { IsDateString, IsNumberString, IsString, } from "class-validator"
+import { IsDate, IsDateString, IsNumber, IsNumberString, IsOptional, IsString, } from "class-validator"
 import mongoose from "mongoose";
 
 
@@ -11,16 +11,18 @@ export class CreateContractDto {
     @IsString()
     tenantId: mongoose.Schema.Types.ObjectId;
 
+    @IsOptional()
     @IsDateString()
     startDate: Date;
 
     @IsDateString()
+    @IsOptional()
     endDate: Date;
 
-    @IsNumberString()
-    deposit: number
+    @IsNumber()
+    depositAmount: number
 
-    @IsNumberString()
+    @IsNumber()
     monthlyRent: number
 
     @IsString()

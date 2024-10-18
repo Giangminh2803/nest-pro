@@ -18,6 +18,9 @@ export class Service {
   unit: string;
 
   @Prop()
+  type: string;
+
+  @Prop()
   createdAt: Date;
 
   @Prop()

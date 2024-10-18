@@ -10,11 +10,13 @@ import { FilesModule } from './files/files.module';
 import { ServicesModule } from './services/services.module';
 import { EquipmentsModule } from './equipments/equipments.module';
 import { RoomsModule } from './rooms/rooms.module';
-import { BillsModule } from './bills/bills.module';
+import { InvoicesModule } from './invoices/invoices.module';
 import { ContractsModule } from './contracts/contracts.module';
 import { PermissionModule } from './permission/permission.module';
 import { RoleModule } from './role/role.module';
 import { DatabasesModule } from './databases/databases.module';
+import { MailModule } from './mail/mail.module';
+
 
 @Module({
   imports: [
@@ -38,17 +40,18 @@ import { DatabasesModule } from './databases/databases.module';
     ServicesModule,
     EquipmentsModule,
     RoomsModule,
-    BillsModule,
+    InvoicesModule,
     ContractsModule,
     PermissionModule,
     RoleModule,
-    DatabasesModule
+    DatabasesModule,
+    MailModule
   ],
   controllers: [AppController],
 
   providers: [
     AppService,
-    
+
   ],
 })
-export class AppModule {}
+export class AppModule { }

@@ -14,16 +14,16 @@ export class User {
   password: string;
 
   @Prop()
-  idCard: number;
+  name: string;
 
   @Prop()
-  name: string;
+  idCard: string;
 
   @Prop()
   phone: string;
 
   @Prop()
-  age: number;
+  birthday: Date;
 
   @Prop()
   gender: string;
@@ -37,9 +37,6 @@ export class User {
  
   @Prop()
   refresh_token: string;
-
-  @Prop({ type: [mongoose.Schema.Types.Array], ref: Room.name })
-  roomsRented:Room[];
 
   @Prop()
   createdAt: Date;
@@ -57,18 +54,21 @@ export class User {
   createdBy: {
     _id: mongoose.Schema.Types.ObjectId;
     email: string;
+    name: string
   };
 
   @Prop({ type: Object })
   updatedBy: {
     _id: mongoose.Schema.Types.ObjectId;
     email: string;
+    name: string
   };
 
   @Prop({ type: Object })
   deletedBy: {
     _id: mongoose.Schema.Types.ObjectId;
     email: string;
+    name: string
   };
 
 }

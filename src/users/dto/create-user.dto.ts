@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsEmail, IsInt, IsNotEmpty, IsNotEmptyObject, IsNumber, IsNumberString, IsObject, IsOptional, IsString, Length, Min, ValidateNested } from "class-validator"
+import { IsDate, IsDateString, IsEmail, IsInt, IsNotEmpty, IsNotEmptyObject, IsNumber, IsNumberString, IsObject, IsOptional, IsString, Length, Min, ValidateNested } from "class-validator"
 import mongoose from "mongoose";
 
 export class CreateUserDto {
@@ -15,9 +15,19 @@ export class CreateUserDto {
     @IsString()
     name: string
 
-    @IsNotEmpty()
-    @IsInt()
-    age: number
+    @IsDateString()
+    @IsOptional()
+    birthday: Date
+
+    @IsNumberString()
+    @IsOptional()
+    @Length(12)
+    idCard: string
+
+    @IsNumberString()
+    @IsOptional()
+    @Length(10)
+    phone: string
 
     @IsString()
     gender: string
@@ -48,9 +58,8 @@ export class RegisterUserDto {
     name: string
 
     
-    @IsNotEmpty()
-    @IsNumberString()
-    age: number
+    @IsDate()
+    birthday: Date
 
     @IsString()
     gender: string
@@ -58,10 +67,16 @@ export class RegisterUserDto {
     @IsString()
     address: string
 
-    @IsNumber()
+    @IsNumberString()
     @Length(12)
     @IsOptional()
-    idCard: number
+    idCard: string
+
+    @IsNumberString()
+    @Length(10)
+    @IsOptional()
+    phone: string
+
 
 
 }

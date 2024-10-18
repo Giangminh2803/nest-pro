@@ -13,7 +13,7 @@ export class RoomsService {
   constructor(@InjectModel(Room.name) private roomModel: SoftDeleteModel<RoomDocument>) { }
 
   async create(createRoomDto: CreateRoomDto, user: IUser) {
-    const isRoomExist = await this.roomModel.findOne({roomNumber: createRoomDto.roomNumber});
+    const isRoomExist = await this.roomModel.findOne({roomName: createRoomDto.roomName});
     if(!isRoomExist){
       const room = await this.roomModel.create({...createRoomDto, createdBy: {
         _id: user._id,
@@ -69,13 +69,7 @@ export class RoomsService {
 
   }
 
-  findByTenantId(id: string) {
-    if(!mongoose.isValidObjectId(id)){
-      throw new BadRequestException('Id Room is not valid!')
-    }
   
-    return this.roomModel.findOne({tenant: id});
-  }
 
   async update(id: string, updateRoomDto: UpdateRoomDto, user: IUser) {
     if(!mongoose.isValidObjectId(id)){

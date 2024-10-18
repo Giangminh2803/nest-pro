@@ -1,0 +1,34 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill</title>
+
+</head>
+
+<body style="font-family: Arial, sans-serif;background-color: #f4f4f4;color: #333;margin: 0;padding: 20px;">
+    <div
+        style="background: white;padding: 20px;border-radius: 8px;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);max-width: 600px;margin: auto;">
+
+        <h1 style="font-size: 24px;color: #2c3e50;margin-bottom: 20px;">Hoá đơn [Số hoá đơn] cho [Dịch vụ]</h1>
+        
+        <p style="line-height: 1.6;">Xin Chào {{user}},</p>
+    
+        <p style="line-height: 1.6;">Đây là lời nhắc thân thiện rằng hoá đơn đính kèm <span class="highlight" {{#with
+                bills}} style="color: #e74c3c;font-weight: bold;">{{_id}}</span> cho <span class="highlight"
+                {{/with}} style="color: #e74c3c;font-weight: bold;"></span> đến hạn vào ngày <span class="highlight"
+                style="color: #e74c3c;font-weight: bold;"> Hãy cho chúng tôi biết nếu bạn có bất
+                cứ thắc mắc nào.</p>
+        {{#with bills}}
+        <p style="line-height: 1.6;"><strong>Số Hoá Đơn:</strong> {{_id}}</p>
+        <p style="line-height: 1.6;"><strong>Dịch vụ tháng:</strong> {{month}}</p>
+        {{!-- <p style="line-height: 1.6;"><strong>Dịch vụ:</strong> {{service}}</p> --}}
+        <p style="line-height: 1.6;"><strong>Chỉ số đầu:</strong> {{firstIndex}}</p>
+        <p style="line-height: 1.6;"><strong>Chỉ số cuối:</strong> {{finalIndex}}</p>
+        <p style="line-height: 1.6;"><strong>Tổng số:</strong> {{total}}</p>
+        <p style="line-height: 1.6;"><strong>Tổng tiền cần thanh toán:</strong> {{money}}</p>
+        {{/with}}
+        <p class="footer"
+            style="line-height: 1.6;margin-top: 20px;font-size: 14px;color: #7f8c8d;text-align: right; margin-right: 20px">
+            Trân trọng,<br>Chủ trọ</p>
+    </div>
+</body>

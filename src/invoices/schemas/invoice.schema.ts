@@ -6,24 +6,18 @@ import { Service, ServiceSchema } from 'src/services/schemas/service.schema';
 import { User } from 'src/users/schemas/user.schema';
 
 
-export type BillDocument = HydratedDocument<Bill>;
+export type InvoiceDocument = HydratedDocument<Invoice>;
 
 @Schema({ timestamps: true })
-export class Bill {
+export class Invoice {
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
-    userId: mongoose.Schema.Types.ObjectId;
+    tenantId: mongoose.Schema.Types.ObjectId;
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Room.name })
     roomId: mongoose.Schema.Types.ObjectId;
 
-    @Prop()
-    amount: number;
-
-    @Prop()
-    month: number;
-
-    @Prop()
-    totalNumber: number;
+    @Prop({type:  mongoose.Schema.Types.ObjectId, ref: Service.name})
+    serviceId:  mongoose.Schema.Types.ObjectId
 
     @Prop()
     firstIndex: number;
@@ -32,17 +26,26 @@ export class Bill {
     finalIndex: number;
 
     @Prop()
+    totalNumber: number;
+
+    @Prop()
+    month: number;
+
+    @Prop()
     description: string;
+
+    @Prop()
+    amount: number;
+
+    @Prop()
+    priceUnit: number;
 
     @Prop()
     status: string;
 
-    @Prop({type:  mongoose.Schema.Types.ObjectId, ref: Service.name})
-    serviceId:  mongoose.Schema.Types.ObjectId
-
     @Prop()
     dueDate: Date;
-
+ 
     @Prop()
     createdAt: Date;
 
@@ -75,4 +78,4 @@ export class Bill {
 
 }
 
-export const BillSchema = SchemaFactory.createForClass(Bill);
+export const InvoiceSchema = SchemaFactory.createForClass(Invoice);

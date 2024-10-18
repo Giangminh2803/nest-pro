@@ -28,12 +28,6 @@ export class RoomsController {
   }
 
 
-  @ResponseMessage('Fetch Room by Tenant Id!')
-  @Get('/by-tenant/:id')
-  findByTenantId(@Param('id') id: string) {
-    return this.roomsService.findByTenantId(id);
-  }
-
   @ResponseMessage('Fetch Room by Id!')
   @Get(':id')
   findByIdRoom(@Param('id') id: string) {

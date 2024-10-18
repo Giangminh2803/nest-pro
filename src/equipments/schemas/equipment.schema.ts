@@ -6,16 +6,16 @@ export type EquipmentDocument = HydratedDocument<Equipment>;
 @Schema({ timestamps: true })
 export class Equipment {
   @Prop()
-  equipmentName: string;
+  name: string;
 
   @Prop()
   status: string;
 
   @Prop()
-  purchaseDate: Date;
+  price: number;
 
   @Prop()
-  price: number;
+  description: string;
 
   @Prop()
   createdAt: Date;

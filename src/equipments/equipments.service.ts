@@ -14,7 +14,7 @@ export class EquipmentsService {
   constructor(@InjectModel(Equipment.name) private equipmentModel: SoftDeleteModel<EquipmentDocument>) { }
 
   async create(createEquipmentDto: CreateEquipmentDto, user: IUser) {
-    const isExistName = await this.equipmentModel.findOne({ equipmentName: createEquipmentDto.equipmentName })
+    const isExistName = await this.equipmentModel.findOne({ name: createEquipmentDto.name })
     if (isExistName)
       throw new BadRequestException('Equipment name already existed!');
     const equipment = await this.equipmentModel.create({

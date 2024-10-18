@@ -15,6 +15,12 @@ export class Contract {
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
     tenantId: mongoose.Schema.Types.ObjectId;
 
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
+    innkeeperId: mongoose.Schema.Types.ObjectId;
+
+    @Prop()
+    numberPeople: number
+
     @Prop()
     startDate: Date;
 
@@ -22,13 +28,13 @@ export class Contract {
     endDate: Date;
 
     @Prop()
-    deposit: number;
+    depositAmount: number;
 
     @Prop()
     monthlyRent: number;
 
     @Prop()
-    terms: string;
+    description: string;
 
     @Prop()
     status: string;
@@ -50,18 +56,21 @@ export class Contract {
     createdBy: {
         _id: mongoose.Schema.Types.ObjectId;
         email: string;
+        name: string
     };
 
     @Prop({ type: Object })
     updatedBy: {
         _id: mongoose.Schema.Types.ObjectId;
         email: string;
+        name: string
     };
 
     @Prop({ type: Object })
     deletedBy: {
         _id: mongoose.Schema.Types.ObjectId;
         email: string;
+        name: string
     };
    
 
