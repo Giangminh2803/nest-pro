@@ -23,9 +23,9 @@ export class Service {
   @Prop()
   createdAt: Date;
 
-  @Prop()
+  @Prop() 
   updatedAt: Date;
-
+ 
   @Prop()
   isDeleted: boolean;
 

@@ -1,34 +1,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bill</title>
-
+    <title>Invoice</title>
 </head>
 
-<body style="font-family: Arial, sans-serif;background-color: #f4f4f4;color: #333;margin: 0;padding: 20px;">
-    <div
-        style="background: white;padding: 20px;border-radius: 8px;box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);max-width: 600px;margin: auto;">
-
-        <h1 style="font-size: 24px;color: #2c3e50;margin-bottom: 20px;">Hoá đơn [Số hoá đơn] cho [Dịch vụ]</h1>
-        
-        <p style="line-height: 1.6;">Xin Chào {{user}},</p>
-    
-        <p style="line-height: 1.6;">Đây là lời nhắc thân thiện rằng hoá đơn đính kèm <span class="highlight" {{#with
-                bills}} style="color: #e74c3c;font-weight: bold;">{{_id}}</span> cho <span class="highlight"
-                {{/with}} style="color: #e74c3c;font-weight: bold;"></span> đến hạn vào ngày <span class="highlight"
-                style="color: #e74c3c;font-weight: bold;"> Hãy cho chúng tôi biết nếu bạn có bất
-                cứ thắc mắc nào.</p>
-        {{#with bills}}
-        <p style="line-height: 1.6;"><strong>Số Hoá Đơn:</strong> {{_id}}</p>
+<body style="font-family: 'Arial', sans-serif; background-color: #f4f4f4; color: #333; margin: 0 auto; padding: 20px;">
+    <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); max-width: 600px; margin: auto;">
+        <h1 style="font-size: 28px; color: #2c3e50; margin-bottom: 20px; text-align: center;">Hoá đơn</h1>
+        <p style="line-height: 1.6;">Xin Chào <strong style="color: #2c3e50; font-weight: bold;">{{receiver}}</strong>,</p>
+        <p style="line-height: 1.6;">Đây là lời nhắc thân thiện rằng hoá đơn tiền dịch vụ. Hãy cho chúng tôi biết nếu bạn có bất cứ thắc mắc nào.</p>
+        {{#each bills}}
+        <p style="font-weight: bold; margin-top: 15px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Hoá đơn dịch vụ</p>
+        <p style="line-height: 1.6;"><strong>Dịch vụ:</strong> {{service}}</p>
+        <p style="line-height: 1.6;"><strong>Số Hoá Đơn:</strong> {{id}}</p>
         <p style="line-height: 1.6;"><strong>Dịch vụ tháng:</strong> {{month}}</p>
-        {{!-- <p style="line-height: 1.6;"><strong>Dịch vụ:</strong> {{service}}</p> --}}
-        <p style="line-height: 1.6;"><strong>Chỉ số đầu:</strong> {{firstIndex}}</p>
-        <p style="line-height: 1.6;"><strong>Chỉ số cuối:</strong> {{finalIndex}}</p>
-        <p style="line-height: 1.6;"><strong>Tổng số:</strong> {{total}}</p>
-        <p style="line-height: 1.6;"><strong>Tổng tiền cần thanh toán:</strong> {{money}}</p>
-        {{/with}}
-        <p class="footer"
-            style="line-height: 1.6;margin-top: 20px;font-size: 14px;color: #7f8c8d;text-align: right; margin-right: 20px">
-            Trân trọng,<br>Chủ trọ</p>
+        {{#if firstIndex}}
+        <p style="line-height: 1.6;"><strong>Chỉ số đầu:</strong> {{firstIndex}} {{unit}}</p>
+        <p style="line-height: 1.6;"><strong>Chỉ số cuối:</strong> {{finalIndex}} {{unit}}</p>
+        <p style="line-height: 1.6;"><strong>Tiêu thụ:</strong> {{total}} {{unit}}</p>
+        {{/if}}
+        <p style="line-height: 1.6;"><strong>Đơn giá:</strong> {{price}}/{{unit}}</p>
+        <p style="line-height: 1.6;"><strong>Tổng tiền cần thanh toán:</strong> <span style="font-size: 20px; color: #e74c3c; font-weight: bold;">{{money}}</span></p>
+        <br/>
+        {{/each}}
+        <p style="font-weight: bold; margin-top: 15px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Tổng tiền cần thanh toán cho tất cả dịch vụ:</p>
+        <p style="line-height: 1.6;"><strong class="amount" style="font-size: 20px; color: #e74c3c; font-weight: bold;">{{total}}</strong></p>
+        <p class="footer" style="line-height: 1.6; margin-top: 30px; font-size: 14px; color: #7f8c8d; text-align: right;">Trân trọng<br>Chủ trọ</p>
     </div>
 </body>

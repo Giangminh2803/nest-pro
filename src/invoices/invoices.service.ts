@@ -8,7 +8,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { ServicesService } from 'src/services/services.service';
 import aqp from 'api-query-params';
 import mongoose from 'mongoose';
-
+ 
 @Injectable()
 export class InvoicesService {
   constructor(
@@ -127,7 +127,7 @@ export class InvoicesService {
         }
       });
       const invoice = await this.invoiceModel.findOne({ _id: id });
-      let update;``
+      let update;
       if(invoice){
          update = await this.invoiceModel.updateOne({ _id: id }, {
           totalNumber: invoice.finalIndex - invoice.firstIndex,

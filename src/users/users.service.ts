@@ -22,17 +22,24 @@ export class UsersService {
     return hash;
   }
 
-  isEmailExist = async (email: string) => {
-    const isExist = await this.userModel.findOne({ email });
-    if (isExist && isExist.isDeleted) {
-      return true;
+  isEmailExist = async (createUserDto: any) => {
+    const isExist = await this.userModel.findOne({ email: createUserDto.email });
+    if (isExist) {
+      if (
+        !isExist.isDeleted ||
+        isExist.idCard === createUserDto.idCard ||
+        isExist.phone === createUserDto.phone
+      ) {
+        return true;
+      }
     } else {
       return false;
     }
+
   }
   async create(createUserDto: CreateUserDto, user: IUser) {
-    if (await this.isEmailExist(createUserDto.email)) {
-      throw new BadRequestException(`Email: ${createUserDto.email} is exist`);
+    if (await this.isEmailExist(createUserDto)) {
+      throw new BadRequestException(`Customer information already exists`);
     }
     const hashPassword = this.hashPassword(createUserDto.password);
     createUserDto.password = hashPassword;

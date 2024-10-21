@@ -18,7 +18,7 @@ export class MailController {
     private userModel: SoftDeleteModel<UserDocument>,
 
     @InjectModel(Invoice.name)
-    private billModel: SoftDeleteModel<InvoiceDocument>,
+    private invoiceModel: SoftDeleteModel<InvoiceDocument>,
     @InjectModel(Role.name)
     private roleModel: SoftDeleteModel<RoleDocument>,
 
@@ -38,39 +38,55 @@ export class MailController {
 
     for (const user of users) {
       const id = user._id;
-      const nameUser = user.name;
-      const billWithUserId = await this.billModel.find({ tenantId: id })
-      let serviceName: string, unit;
-      if (billWithUserId?.length) {
-        const bill = billWithUserId.map(item => {
-
-          if (item.status === 'NOT YET PAID') {
+      
+      const invoiceWithUserId = await this.invoiceModel.find({tenantId: id})
+      .populate({path: 'tenantId', select: {name: 1, phone: 1}})
+      .populate({path: 'roomId', select: {roomName: 1}})
+      .populate({path: 'serviceId', select: {serviceName: 1, unit: 1}})
+      ;
+     
+      if (invoiceWithUserId?.length) {
+        let totalMoney: number = 0;
+        let bill = invoiceWithUserId.map(item =>{
+          
+          if (item.status === 'UNPAID') {
+            totalMoney += item.amount;
+           
+          
             return {
-
-              _id: item._id,
-              month: item.month,
+              id: item._id.toString(),
+              month: item.month, 
+              // @ts-ignore: Unreachable code error
+              service: item.serviceId.serviceName,
+              // @ts-ignore: Unreachable code error
+              room: item.roomId?.roomName,
+              // @ts-ignore: Unreachable code error
+              unit: item.serviceId.unit,
               firstIndex: item?.firstIndex,
               finalIndex: item?.finalIndex,
+              price: item.priceUnit.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + "đ",
               total: item?.totalNumber,
-              money: `${item?.amount}`.replace(/\B(?=(\d{3})+ (?!\d))/g, ',') + "đ"
+              money: item?.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + "đ"
 
             }
-          }
-
-        })
+          } 
+ 
+        }) 
+ 
         await this.mailerService.sendMail({
           to: 'dogiang122003@gmail.com',
-          from: '"Hello world" <abc@gmail.com>',
-          subject: "Welcome to Nice App",
+          from: '"Thông báo hoá đơn" <abc@gmail.com>',
+          subject: "Hoá đơn dịch vụ",
           template: 'test',
           context: {
-            user: nameUser,
+            receiver: user.name,
             bills: bill,
-            service: serviceName
+            total: totalMoney.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + " đ"
           }
 
         })
-      }
+      
+              }
     }
 
     // const tenant = await this.userModel.findUserByRole({});
@@ -81,4 +97,4 @@ export class MailController {
 
 
   }
-}
+} 

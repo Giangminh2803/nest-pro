@@ -11,9 +11,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UsersModule } from 'src/users/users.module';
 import { Role, RoleSchema } from 'src/role/schemas/role.schema';
 import { Service, ServiceSchema } from 'src/services/schemas/service.schema';
+import { InvoicesService } from 'src/invoices/invoices.service';
 
 @Module({
-  imports: [
+  imports: [ 
     MailerModule.forRootAsync({
       // imports: [ConfigModule], // import module if not enabled globally
       useFactory: async (configService: ConfigService) => ({
@@ -37,6 +38,7 @@ import { Service, ServiceSchema } from 'src/services/schemas/service.schema';
             strict: true,
           },
         },
+        preview: true
       }),
       inject: [ConfigService],
     }),

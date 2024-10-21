@@ -15,5 +15,6 @@ import { ServicesModule } from 'src/services/services.module';
   ],
   controllers: [InvoicesController],
   providers: [InvoicesService],
+  exports: [InvoicesService]
 })
 export class InvoicesModule { }

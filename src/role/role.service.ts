@@ -55,14 +55,14 @@ export class RoleService {
         pageSize: defaultLimit,
         pages: totalPages,
         total: totalItem
-      },
+      }, 
       result
-    };
+    }; 
   }
 
   async findOne(id: string) {
     return (await this.roleModel.findOne({_id: id}))
-    .populate({
+    .populate({ 
       path: "permissions",
       select: {_id: 1, apiPath: 1, name: 1, method: 1, module: 1}
     });
@@ -72,13 +72,13 @@ export class RoleService {
     return await this.roleModel.updateOne({_id: id}, {
       ...updateRoleDto,
       updatedBy:{
-        _id: user._id,
+        _id: user._id, 
         email: user.email
       }
     });
   }
-
-  async remove(id: string, user: IUser) {
+ 
+  async remove(id: string, user: IUser)  {
     const foundRole = await this.roleModel.findById(id);
     if(foundRole.name === ADMIN_ROLE){
       throw new BadRequestException("Can not delete role ADMIN")

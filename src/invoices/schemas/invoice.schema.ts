@@ -22,8 +22,8 @@ export class Invoice {
     @Prop()
     firstIndex: number;
 
-    @Prop()
-    finalIndex: number;
+    @Prop() 
+    finalIndex: number; 
 
     @Prop()
     totalNumber: number;
@@ -34,9 +34,9 @@ export class Invoice {
     @Prop()
     description: string;
 
-    @Prop()
+    @Prop() 
     amount: number;
-
+ 
     @Prop()
     priceUnit: number;
 
@@ -62,7 +62,7 @@ export class Invoice {
     createdBy: {
         _id: mongoose.Schema.Types.ObjectId;
         email: string;
-    };
+    }; 
 
     @Prop({ type: Object })
     updatedBy: {

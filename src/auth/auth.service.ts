@@ -78,7 +78,7 @@ export class AuthService {
 
     async register(registerUserDto: RegisterUserDto) {
 
-        if (await this.usersService.isEmailExist(registerUserDto.email)) {
+        if (await this.usersService.isEmailExist(registerUserDto)) {
             throw new BadRequestException(`Email: ${registerUserDto.email} is exist`);
         }
         let newUser = await this.usersService.register(registerUserDto);
