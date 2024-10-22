@@ -16,10 +16,15 @@ import { PermissionModule } from './permission/permission.module';
 import { RoleModule } from './role/role.module';
 import { DatabasesModule } from './databases/databases.module';
 import { MailModule } from './mail/mail.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([{
+      ttl: 60,
+      limit: 1,
+    }]),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({

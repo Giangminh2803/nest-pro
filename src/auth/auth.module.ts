@@ -10,6 +10,7 @@ import { JwtStrategy } from './passport/jwt.strategy';
 import { AuthController } from './auth.controller';
 import ms from 'ms';
 import { RoleModule } from 'src/role/role.module';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   providers: [AuthService, LocalStrategy, JwtStrategy],
@@ -28,7 +29,7 @@ import { RoleModule } from 'src/role/role.module';
     }),
   ],
   controllers: [AuthController],
- 
+  
   exports: [AuthService],
 })
 export class AuthModule { }

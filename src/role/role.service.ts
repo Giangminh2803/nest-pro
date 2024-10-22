@@ -36,7 +36,7 @@ export class RoleService {
     delete filter.current;
     delete filter.pageSize;
     let defaultCurrent = currentPage ? currentPage : 1;
-    let defaultLimit = limit ? limit : 99;
+    let defaultLimit = limit ? limit : 5;
     let skip = (defaultCurrent - 1) * defaultLimit;
     const totalItem = (await this.roleModel.find(filter)).length;
     const totalPages = Math.ceil(totalItem / defaultLimit)
@@ -75,7 +75,7 @@ export class RoleService {
         _id: user._id, 
         email: user.email
       }
-    });
+    }); 
   }
  
   async remove(id: string, user: IUser)  {

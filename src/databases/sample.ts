@@ -566,9 +566,9 @@ export const INIT_PERMISSION = [
 
 	{
 
-		"name": "Get Role",
+		"name": "Create a Role",
 		"apiPath": "/api/v1/roles",
-		"method": "GET",
+		"method": "POST",
 		"module": "Role",
 		"createdBy": {
 			"_id": "",
@@ -581,7 +581,25 @@ export const INIT_PERMISSION = [
 		"__v": 0,
 		"updatedBy": {}
 
-	}, //Get Role
+	}, //Create a Role
+	{
+
+		"name": "Fetch a Role",
+		"apiPath": "/api/v1/roles/:id",
+		"method": "POST",
+		"module": "Role",
+		"createdBy": {
+			"_id": "",
+			"email": "admin@gmail.com"
+		},
+		"isDeleted": false,
+		"deletedAt": null,
+		"createdAt": "2024-08-17T04:41:40.369Z",
+		"updatedAt": "",
+		"__v": 0,
+		"updatedBy": {}
+
+	}, //Fetch Role with id
 	{
 
 		"name": "Update Role",
@@ -653,7 +671,7 @@ export const INIT_PERMISSION = [
 		"__v": 0,
 		"updatedBy": {}
 
-	}, //Update Role
+	}, //Create Permission
 	{
 
 		"name": "Update Permission",
@@ -671,7 +689,7 @@ export const INIT_PERMISSION = [
 		"__v": 0,
 		"updatedBy": {}
 
-	}, //Update Role
+	}, //Update Permission
 	{
 
 		"name": "Soft Delete Permission",
@@ -689,7 +707,7 @@ export const INIT_PERMISSION = [
 		"__v": 0,
 		"updatedBy": {}
 
-	}, //Soft-delete Role
+	}, //Soft-delete Permission
 	{
 
 		"name": "Fetch Permissions with paginate",
@@ -707,5 +725,23 @@ export const INIT_PERMISSION = [
 		"__v": 0,
 		"updatedBy": {}
 
-	}, //Fetch Roles with paginate
+	}, //Fetch Permission with paginate 
+	{
+
+		"name": "Fetch a Permission with id",
+		"apiPath": "/api/v1/permissions/:id",
+		"method": "POST",
+		"module": "Permission",
+		"createdBy": {
+			"_id": "",
+			"email": "admin@gmail.com"
+		},
+		"isDeleted": false,
+		"deletedAt": null,
+		"createdAt": "2024-08-17T04:41:40.369Z",
+		"updatedAt": "",
+		"__v": 0,
+		"updatedBy": {}
+
+	}, //Fetch Permission with id
 ]

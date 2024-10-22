@@ -16,6 +16,7 @@ export class PermissionController {
   }
 
   @Get()
+  @ResponseMessage('Fetch Permission with paginate!')
   findAll(
     @Query("current") current: string,
     @Query("pageSize") pageSize: string,
@@ -24,7 +25,8 @@ export class PermissionController {
     return this.permissionService.findAll(+current, +pageSize, qs);
   }
 
-  @Get(':id')
+  @ResponseMessage('Fetch Permission with id!')
+  @Post(':id')
   findOne(@Param('id') id: string) {
     return this.permissionService.findOne(id);
   }
@@ -35,6 +37,7 @@ export class PermissionController {
     return this.permissionService.update(id, updatePermissionDto, user);
   }
 
+  @ResponseMessage('Deleted a Permission successfully!')
   @Delete(':id')
   remove(@Param('id') id: string, @User() user: IUser) {
     return this.permissionService.remove(id, user);

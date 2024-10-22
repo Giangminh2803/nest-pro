@@ -5,6 +5,7 @@ import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { TransformInterceptor } from './core/transform.interceptor';
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 async function bootstrap() {
 
 
@@ -12,7 +13,9 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const reflector = app.get(Reflector);
   app.useGlobalGuards(new JwtAuthGuard(reflector));
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true
+  }));
   app.useGlobalInterceptors(new TransformInterceptor(reflector));
 
   app.setGlobalPrefix('api')
@@ -29,6 +32,9 @@ async function bootstrap() {
     "preflightContinue": false,
     credentials: true
   });
+  //CONFIG HELMET
+  app.use(helmet());
+
   await app.listen(configService.get<string>('PORT'));
 }
 bootstrap();

@@ -16,10 +16,9 @@ import { InvoicesService } from 'src/invoices/invoices.service';
 @Module({
   imports: [ 
     MailerModule.forRootAsync({
-      // imports: [ConfigModule], // import module if not enabled globally
+     
       useFactory: async (configService: ConfigService) => ({
-        // transport: configService.get("MAIL_TRANSPORT"),
-        // or
+
         transport: {
           host: configService.get<string>('EMAIL_HOST'),
           secure: false,
@@ -28,9 +27,7 @@ import { InvoicesService } from 'src/invoices/invoices.service';
             pass: configService.get<string>('EMAIL_AUTH_PASS'),
           },
         },
-        // defaults: {
-        //   from: `"No Reply" <${configService.get<string>('MAIL_FROM')}>`,
-        // },
+        
         template: {
           dir: join(__dirname, 'templates'),
           adapter: new HandlebarsAdapter(),

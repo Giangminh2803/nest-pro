@@ -13,11 +13,11 @@ export class CreateRoleDto {
     description: string;
 
     
-    @IsNotEmpty({message:'method is not empty'})
+    @IsNotEmpty({message:'IsActive is not empty'})
     isActive: boolean;
     
     
-    @IsNotEmpty({message:'permission is not empty'})
+    @IsNotEmpty({message:'Permissions is not empty'})
     permissions: [mongoose.Schema.Types.ObjectId];
 
     
