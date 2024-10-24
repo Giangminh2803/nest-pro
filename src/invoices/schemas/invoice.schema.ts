@@ -10,20 +10,39 @@ export type InvoiceDocument = HydratedDocument<Invoice>;
 
 @Schema({ timestamps: true })
 export class Invoice {
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
-    tenantId: mongoose.Schema.Types.ObjectId;
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Room.name })
-    roomId: mongoose.Schema.Types.ObjectId;
+    @Prop({ type: Object })
+    room: {
+        _id: mongoose.Schema.Types.ObjectId,
+        roomName: string,
+        price: number,
 
-    @Prop({type:  mongoose.Schema.Types.ObjectId, ref: Service.name})
-    serviceId:  mongoose.Schema.Types.ObjectId
+    };
+
+    @Prop({ type: Object })
+    tenant: {
+        _id: mongoose.Schema.Types.ObjectId;
+        name: string,
+        idCard: string,
+        phone: string
+    }
+
+    @Prop({ type: Object })
+    service: {
+        _id: mongoose.Schema.Types.ObjectId;
+        name: string,
+        unit: string,
+        priceUnit: number;
+
+    }
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Service.name })
+    serviceId: mongoose.Schema.Types.ObjectId
 
     @Prop()
     firstIndex: number;
 
-    @Prop() 
-    finalIndex: number; 
+    @Prop()
+    finalIndex: number;
 
     @Prop()
     totalNumber: number;
@@ -34,18 +53,17 @@ export class Invoice {
     @Prop()
     description: string;
 
-    @Prop() 
-    amount: number;
- 
     @Prop()
-    priceUnit: number;
+    amount: number;
+
+
 
     @Prop()
     status: string;
 
     @Prop()
     dueDate: Date;
- 
+
     @Prop()
     createdAt: Date;
 
@@ -62,7 +80,7 @@ export class Invoice {
     createdBy: {
         _id: mongoose.Schema.Types.ObjectId;
         email: string;
-    }; 
+    };
 
     @Prop({ type: Object })
     updatedBy: {

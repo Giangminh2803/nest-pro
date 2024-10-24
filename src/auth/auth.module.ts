@@ -11,9 +11,13 @@ import { AuthController } from './auth.controller';
 import ms from 'ms';
 import { RoleModule } from 'src/role/role.module';
 import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 @Module({
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy ],
+
+  
+
   imports: [UsersModule,
     PassportModule,
     RoleModule,
@@ -29,7 +33,6 @@ import { APP_GUARD } from '@nestjs/core';
     }),
   ],
   controllers: [AuthController],
-  
   exports: [AuthService],
 })
 export class AuthModule { }

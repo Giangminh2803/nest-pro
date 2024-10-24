@@ -19,9 +19,5 @@ export class CreateRoleDto {
     
     @IsNotEmpty({message:'Permissions is not empty'})
     permissions: [mongoose.Schema.Types.ObjectId];
-
-    
-   
-
   
 }

@@ -45,7 +45,7 @@ export class InvoicesService {
       throw new BadRequestException('Data is not valid!')
     }
     
-    const service = await this.servicesService.findOne(createInvoiceDto.serviceId.toString());
+    const service = await this.servicesService.findOne(createInvoiceDto.service._id.toString());
     let totalNumber: number;
     if(service.type === "E&W"){
       totalNumber = createInvoiceDto.finalIndex - createInvoiceDto.firstIndex;
@@ -110,7 +110,7 @@ export class InvoicesService {
       throw new BadRequestException('Id is not valid');
     }
 
-    return await this.invoiceModel.find({ tenantId: id });
+    return await this.invoiceModel.find({ "tenant._id": id });
   }
 
   async update(id: string, updateInvoiceDto: UpdateInvoiceDto, user: IUser) {
@@ -131,7 +131,7 @@ export class InvoicesService {
       if(invoice){
          update = await this.invoiceModel.updateOne({ _id: id }, {
           totalNumber: invoice.finalIndex - invoice.firstIndex,
-          amount: invoice.priceUnit * (invoice.finalIndex - invoice.firstIndex)
+          amount: invoice.service.priceUnit * (invoice.finalIndex - invoice.firstIndex)
         });
       }else{
         throw new BadRequestException("Something wrong!!!")

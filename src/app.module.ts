@@ -16,16 +16,17 @@ import { PermissionModule } from './permission/permission.module';
 import { RoleModule } from './role/role.module';
 import { DatabasesModule } from './databases/databases.module';
 import { MailModule } from './mail/mail.module';
-import { ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
+import { APP_GUARD } from '@nestjs/core';
 
 
 @Module({
   imports: [
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([{
-      ttl: 60,
-      limit: 1,
+      ttl: 60000,
+      limit: 10,
     }]),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
@@ -56,7 +57,14 @@ import { ScheduleModule } from '@nestjs/schedule';
   ],
   controllers: [AppController],
 
+
+
+
   providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard
+    },
     AppService,
 
   ],
