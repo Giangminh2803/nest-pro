@@ -9,14 +9,30 @@ export type ContractDocument = HydratedDocument<Contract>;
 
 export class Contract {
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Room.name })
-    roomId: mongoose.Schema.Types.ObjectId;
+    @Prop({type: Object})
+    room: {
+        _id: mongoose.Schema.Types.ObjectId,
+        roomName: string,
+        price: number,
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
-    tenantId: mongoose.Schema.Types.ObjectId;
+    };
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name })
-    innkeeperId: mongoose.Schema.Types.ObjectId;
+    @Prop({type: Object})
+    tenant: {
+        _id: mongoose.Schema.Types.ObjectId;
+        name: string,
+        idCard: string,
+        phone: string
+    }
+
+
+    @Prop({type: Object})
+    innkeeper: {
+        _id: mongoose.Schema.Types.ObjectId;
+        name: string,
+        idCard: string,
+        phone: string
+    }
 
     @Prop()
     numberPeople: number
@@ -31,14 +47,10 @@ export class Contract {
     depositAmount: number;
 
     @Prop()
-    monthlyRent: number;
-
-    @Prop()
     description: string;
 
     @Prop()
     status: string;
-
 
     @Prop()
     createdAt: Date;

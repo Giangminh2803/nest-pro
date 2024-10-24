@@ -60,7 +60,7 @@ export class RegisterUserDto {
     name: string
 
     
-    @IsDate()
+    @IsDateString()
     birthday: Date
 
     @IsString()

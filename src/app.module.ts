@@ -17,10 +17,12 @@ import { RoleModule } from './role/role.module';
 import { DatabasesModule } from './databases/databases.module';
 import { MailModule } from './mail/mail.module';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { ScheduleModule } from '@nestjs/schedule';
 
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([{
       ttl: 60,
       limit: 1,

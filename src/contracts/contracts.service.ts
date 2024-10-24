@@ -7,27 +7,45 @@ import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from 'src/users/user.interface';
 import mongoose from 'mongoose';
 import aqp from 'api-query-params';
+import { User, UserDocument } from 'src/users/schemas/user.schema';
+import { Room, RoomDocument } from 'src/rooms/schemas/room.schema';
+import { RoleDocument } from 'src/role/schemas/role.schema';
+import { Cron } from '@nestjs/schedule';
 
 
 @Injectable()
 export class ContractsService {
-  constructor(@InjectModel(Contract.name) private contractModel: SoftDeleteModel<ContractDocument>) { }
+  constructor(
+    @InjectModel(Contract.name) private contractModel: SoftDeleteModel<ContractDocument>,
+    @InjectModel(User.name) private userModel: SoftDeleteModel<UserDocument>,
+    @InjectModel(Room.name) private roomModel: SoftDeleteModel<RoomDocument>) { }
 
   async create(createContractDto: CreateContractDto, user: IUser) {
-    const isExist = await this.contractModel.findOne({ roomId: createContractDto.roomId, isDeleted: false });
+    const isExist = await this.roomModel.findOne({
+      _id: createContractDto.room._id,
+      status: "OCCUPIED"
+      }
+    );
     if (isExist) {
-      //throw new BadRequestException('Data is not valid!');
-      return isExist;
+      throw new BadRequestException('Data is not valid!');
     }
+    
     const contract = await this.contractModel.create({
       ...createContractDto,
-      innkeeperId: user._id,
+      innkeeper:{
+        _id: user._id,
+        name: user.name,
+        phone: user.phone,
+        idCard: user.idCard
+      },
       createdBy: {
         _id: user._id,
         email: user.email,
         name: user.name
       }
     })
+
+    await this.roomModel.updateOne({_id: createContractDto.room._id}, {status: "OCCUPIED"});
 
     return {
       _id: contract._id,
@@ -66,30 +84,30 @@ export class ContractsService {
 
   }
 
-  async findByTenantId(id: string){
+  async findByTenantId(id: string) {
     if (!mongoose.isValidObjectId(id)) {
       throw new BadRequestException('Id is not valid!')
     }
-    return await this.contractModel.find({tenantId: id})
+    return await this.contractModel.find({ "tenant._id": id })
 
   }
-  
+
   async update(id: string, updateContractDto: UpdateContractDto, user: IUser) {
     if (!mongoose.isValidObjectId(id)) {
       throw new BadRequestException('Id is not valid!')
     }
 
-    const isExist = await this.contractModel.findOne({_id: id, isDeleted: false});
-    if(isExist){
+    const isExist = await this.contractModel.findOne({ _id: id, isDeleted: false });
+    if (isExist) {
       return await this.contractModel.updateOne({ _id: id }, {
         ...updateContractDto,
         updatedBy: {
           _id: user._id,
           email: user.email,
           name: user.name
-  
+
         },
-    
+
       });
     }
     throw new BadRequestException('Something wrong!!!');
@@ -99,13 +117,20 @@ export class ContractsService {
     if (!mongoose.isValidObjectId(id)) {
       throw new BadRequestException('Id is not valid!')
     }
-    await this.contractModel.updateOne({_id: id}, {
+    await this.contractModel.updateOne({ _id: id }, {
       deletedBy: {
         _id: user._id,
         email: user.email,
         name: user.name
       }
     })
-    return await this.contractModel.softDelete({_id: id});
+    return await this.contractModel.softDelete({ _id: id });
   }
+
+  @Cron('0 6 * * * *')
+  async autoUpdateStatus(user: IUser) {
+    const today = new Date();
+    await this.contractModel.updateMany({endDate: {$lt: today}}, {status: "EXPIRED"})
+   console.log('call me');
+}
 }

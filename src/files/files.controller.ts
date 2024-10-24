@@ -3,6 +3,7 @@ import { FilesService } from './files.service';
 import { CreateFileDto } from './dto/create-file.dto';
 import { UpdateFileDto } from './dto/update-file.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ResponseMessage } from 'src/decorator/customize';
 
 @Controller('files')
 export class FilesController {
@@ -11,6 +12,7 @@ export class FilesController {
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('imageFile'))
+  @ResponseMessage('Upload files!')
   uploadFile(@UploadedFile(
     new ParseFilePipeBuilder()
     .addFileTypeValidator({

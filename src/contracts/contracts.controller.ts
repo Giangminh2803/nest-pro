@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestj
 import { ContractsService } from './contracts.service';
 import { CreateContractDto } from './dto/create-contract.dto';
 import { UpdateContractDto } from './dto/update-contract.dto';
-import { ResponseMessage, User } from 'src/decorator/customize';
+import { Public, ResponseMessage, User } from 'src/decorator/customize';
 import { IUser } from 'src/users/user.interface';
 
 @Controller('contracts')
@@ -27,7 +27,7 @@ export class ContractsController {
 
   @ResponseMessage('Fetch data Contracts by Tenant!')
   @Post("/by-tenant/:id")
-  findAllByTenant(@Param('id') id: string) {
+  findAllByTenant(@Body('id') id: string) {
     return this.contractsService.findByTenantId(id);
   }
 
@@ -43,4 +43,5 @@ export class ContractsController {
   remove(@Param('id') id: string, @User() user: IUser) {
     return this.contractsService.remove(id, user);
   }
+
 }
