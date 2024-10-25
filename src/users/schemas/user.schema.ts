@@ -25,6 +25,15 @@ export class User {
   birthday: Date;
 
   @Prop()
+  codeId: string;
+
+  @Prop()
+  codeExpire: Date;
+
+  @Prop()
+  isActive: boolean;
+
+  @Prop()
   gender: string;
 
   @Prop({type: mongoose.Schema.Types.ObjectId, ref: Role.name})

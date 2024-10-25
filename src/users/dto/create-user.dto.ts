@@ -82,3 +82,13 @@ export class RegisterUserDto {
 
 
 }
+
+export class CodeAuthDto {
+    
+    @IsString()
+    _id: string
+
+    @IsString()
+    codeId: string
+
+}

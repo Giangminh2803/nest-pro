@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, SetMetadata } from '@nestjs/common';
-import { CreateUserDto, RegisterUserDto } from './dto/create-user.dto';
+import { CodeAuthDto, CreateUserDto, RegisterUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
@@ -9,11 +9,16 @@ import { SoftDeleteModel } from "soft-delete-plugin-mongoose";
 import { IUser } from './user.interface';
 import aqp from 'api-query-params';
 import { Role, RoleDocument } from 'src/role/schemas/role.schema';
-
+import { v4 as uuidv4 } from 'uuid';
+import dayjs from 'dayjs';
+import { MailerService } from '@nestjs-modules/mailer';
+import { use } from 'passport';
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: SoftDeleteModel<UserDocument>,
-    @InjectModel(Role.name) private roleModel: SoftDeleteModel<RoleDocument>
+    @InjectModel(Role.name) private roleModel: SoftDeleteModel<RoleDocument>,
+    private readonly mailerService: MailerService
+
   ) { }
 
   hashPassword = (password: string) => {
@@ -61,7 +66,7 @@ export class UsersService {
 
   async register(registerUserDto: RegisterUserDto) {
     const userRole = await this.roleModel.findOne({ name: USER_ROLE });
-
+    const codeId = uuidv4();
     let { name, email, birthday, gender, address } = registerUserDto;
     const hashPassword = this.hashPassword(registerUserDto.password);
     let user = await this.userModel.create(
@@ -70,9 +75,22 @@ export class UsersService {
         birthday,
         gender,
         address,
-        role: userRole?._id
+        isActive: false,
+        role: userRole?._id,
+        codeId: codeId,
+        codeExpire: dayjs().add(5, 'minutes')
       }
     )
+    this.mailerService.sendMail({
+      to: user.email, // list of receivers
+      from: '"Kích hoạt tài khoản" <abc@gmail.com>', // sender address
+      subject: 'Xác thực tài khoản ✔', // Subject line
+      template: 'verifyCode',
+      context: {
+        receiver: user?.name ?? user.email,
+        activeCode: codeId
+      }
+    })
     return user;
   }
 
@@ -179,4 +197,52 @@ export class UsersService {
     return users;
 
   }
+
+  handleActive = async (data: CodeAuthDto) => {
+    const user = await this.userModel.findOne({
+      _id: data._id,
+      codeId: data.codeId
+    })
+    if(!user){
+      throw new BadRequestException('Invalid data!');
+    }
+    const isBeforeCheck = dayjs().isBefore(user.codeExpire);
+    if(isBeforeCheck){
+      return await this.userModel.updateOne({_id: data._id}, {isActive: true});
+    }else{
+      throw new BadRequestException('Invalid data!');
+    }
+  }
+
+  handleRetryActive = async (email: string) => {
+    const isExist = await this.userModel.findOne(
+      {
+        email: email
+      }
+    )
+    if(!isExist){
+      throw new BadRequestException('Invalid data!');
+    }
+    const codeId = uuidv4();
+    await this.userModel.updateOne({_id: isExist._id},
+      {
+        codeId: codeId,
+        codeExpire: dayjs().add(5, 'minutes')
+      }
+    )
+    this.mailerService.sendMail({
+      to: email, // list of receivers
+      from: '"Kích hoạt tài khoản" <abc@gmail.com>', // sender address
+      subject: 'Xác thực tài khoản ✔', // Subject line
+      template: 'verifyCode',
+      context: {
+        receiver: isExist?.name ?? isExist.email,
+        activeCode: codeId
+      }
+    })
+    return {
+      _id: isExist._id
+    }
+  }
+
 }

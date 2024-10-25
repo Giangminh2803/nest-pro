@@ -2,19 +2,21 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { IUser } from 'src/users/user.interface';
-import { RegisterUserDto } from 'src/users/dto/create-user.dto';
+import { CodeAuthDto, RegisterUserDto } from 'src/users/dto/create-user.dto';
 import { ConfigService } from '@nestjs/config';
 import ms from 'ms';
 import { response, Response } from 'express';
 import { RoleService } from 'src/role/role.service';
+
+
 @Injectable()
 export class AuthService {
     constructor(
         private configService: ConfigService,
         private usersService: UsersService,
         private jwtService: JwtService,
-        private roleSerivce: RoleService
-
+        private roleSerivce: RoleService,
+      
 
     ) { }
 
@@ -25,12 +27,12 @@ export class AuthService {
         if (user) {
             const isValid = this.usersService.isValidPassword(password, user.password);
             if (isValid) {
-                const userRole = user.role as unknown as {_id: string, name: string};
+                const userRole = user.role as unknown as { _id: string, name: string };
                 const temp = await this.roleSerivce.findOne(userRole._id);
 
                 const objUser = {
                     ...user.toObject(),
-                    permissions: temp?.permissions?? []
+                    permissions: temp?.permissions ?? []
                 }
                 return objUser;
             }
@@ -55,7 +57,7 @@ export class AuthService {
         const refresh_token = this.createRefreshToken(payload);
         await this.usersService.updateUserToken(refresh_token, _id);
 
-        const userRole = user.role as unknown as {_id: string, name: string}
+        const userRole = user.role as unknown as { _id: string, name: string }
         const temp = await this.roleSerivce.findOne(userRole._id);
         response.cookie('refresh_token', refresh_token, {
             httpOnly: true,
@@ -70,7 +72,7 @@ export class AuthService {
                 name,
                 email,
                 role,
-                permissions: temp?.permissions??[]
+                permissions: temp?.permissions ?? []
             }
         };
 
@@ -82,11 +84,19 @@ export class AuthService {
             throw new BadRequestException(`Email: ${registerUserDto.email} is exist`);
         }
         let newUser = await this.usersService.register(registerUserDto);
+
+        
         return {
             _id: newUser?._id,
             createdAT: newUser?.createdAt
         };
 
+    }
+    async checkCode(codeAuthDto: CodeAuthDto) {
+        return this.usersService.handleActive(codeAuthDto);
+    }
+    async retryCode(email: string) {
+        return this.usersService.handleRetryActive(email);
     }
 
     createRefreshToken = (payload) => {

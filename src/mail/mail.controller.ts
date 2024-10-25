@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Post } from '@nestjs/common';
 import { MailService } from './mail.service';
 import { Public, ResponseMessage } from 'src/decorator/customize';
 import { MailerService } from '@nestjs-modules/mailer';
@@ -37,21 +37,21 @@ export class MailController {
 
 
     for (const user of users) {
-      
-      
-      const invoiceWithUserId = await this.invoiceModel.find({"tenant._id": user.id});
-     
+
+
+      const invoiceWithUserId = await this.invoiceModel.find({ "tenant._id": user.id });
+
       if (invoiceWithUserId?.length) {
         let totalMoney: number = 0;
-        let bill = invoiceWithUserId.map(item =>{
-          
+        let bill = invoiceWithUserId.map(item => {
+
           if (item.status === 'UNPAID') {
             totalMoney += item.amount;
-           
-          
+
+
             return {
               id: item._id.toString(),
-              month: item.month, 
+              month: item.month,
               service: item.service.name,
               room: item.room?.roomName,
               unit: item.service.unit,
@@ -62,10 +62,10 @@ export class MailController {
               money: item?.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + "đ"
 
             }
-          } 
- 
-        }) 
- 
+          }
+
+        })
+
         await this.mailerService.sendMail({
           to: 'dogiang122003@gmail.com',
           from: '"Thông báo hoá đơn" <abc@gmail.com>',
@@ -78,11 +78,11 @@ export class MailController {
           }
 
         })
-      
-              }
+
+      }
     }
 
-    
+
 
 
 
@@ -90,4 +90,22 @@ export class MailController {
 
 
   }
-} 
+
+  @Post()
+  @Public()
+  @ResponseMessage('Test Email')
+  async handleSendCodeVerifyEmail() {
+ 
+    await this.mailerService.sendMail({
+      to: 'dogiang122003@gmail.com',
+      from: '"Kích hoạt tài khoản" <abc@gmail.com>',
+      subject: "Mã kích hoạt",
+      template: 'resetPassword',
+      context: {
+        receiver: "Giang",
+        codeId: "123123213213"
+      }
+
+    })
+  }
+}

@@ -2,20 +2,20 @@ import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common
 import { Public, ResponseMessage, User } from 'src/decorator/customize';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
-import { RegisterUserDto } from 'src/users/dto/create-user.dto';
+import { CodeAuthDto, RegisterUserDto } from 'src/users/dto/create-user.dto';
 import { Request, Response } from 'express';
 import { IUser } from 'src/users/user.interface';
 import { RoleService } from 'src/role/role.service';
-import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
-
+import { days, Throttle, ThrottlerGuard } from '@nestjs/throttler';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Controller("auth")
 export class AuthController {
     constructor(
 
         private authService: AuthService,
-        private rolesService: RoleService
-
+        private rolesService: RoleService,
+        private readonly mailerService: MailerService
     ) { }
 
     @Public()
@@ -35,6 +35,39 @@ export class AuthController {
     @Post('/register')
     handleRegister(@Body() registerUserDto: RegisterUserDto) {
         return this.authService.register(registerUserDto);
+    }
+
+    @Public()
+    @ResponseMessage('Register a user success')
+    @Post('/mail')
+    handleSendCode(@Body() _id: string) {
+        this.mailerService
+            .sendMail({
+                to: 'dogiang122003@gmail.com', // list of receivers
+                from: '"Kích hoạt tài khoản" <abc@gmail.com>', // sender address
+                subject: 'Xác thực tài khoản ✔', // Subject line
+                text: 'welcome', // plaintext body
+                template: 'verifyCode',
+                context:{
+                    receiver: "Giang",
+                    activeCode: '123123'
+                }
+            })
+        return;
+    }
+
+    @Public()
+    @ResponseMessage('Verify a user success')
+    @Post('/check-code')
+    handleCheckCode(@Body() codeAuthDto: CodeAuthDto) {
+        return this.authService.checkCode(codeAuthDto);
+    }
+
+    @Public()
+    @ResponseMessage('Retry Verify a user success')
+    @Post('/retry-code')
+    handleRetryCheckCode(@Body('email') email: string) {
+        return this.authService.retryCode(email);
     }
 
 
