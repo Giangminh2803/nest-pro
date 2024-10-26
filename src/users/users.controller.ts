@@ -51,4 +51,15 @@ export class UsersController {
   remove(@Param('id') id: string, @User() user: IUser) {
     return this.usersService.remove(id, user);
   }
+
+  @ResponseMessage('New password updated successfully!')
+  @Post('/change-password')
+  changePassword(
+    @Body('_id') id: string,
+    @Body('password') password: string,
+    @Body('oldPassword') oldPassword: string,
+    
+  ) {
+      return this.usersService.changePassword(id, password, oldPassword);
+  }
 }

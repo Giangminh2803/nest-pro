@@ -142,6 +142,19 @@ export class UsersService {
     return compareSync(password, hashPassword);
   }
 
+  async changePassword(id: string, password: string, oldPassword: string) {
+    const user = await this.userModel.findOne({_id: id});
+    const isTrueOldPass = this.isValidPassword(oldPassword, user.password);
+
+    if(isTrueOldPass){
+      const hashPassword = this.hashPassword(password);
+      return await this.userModel.updateOne({_id: id}, {password: hashPassword});
+    }
+    
+    throw new BadRequestException("The old password is incorrect!")
+   
+  }
+
   async update(id: string, updateUserDto: UpdateUserDto, user: IUser) {
     return await this.userModel.updateOne({
       _id: id
