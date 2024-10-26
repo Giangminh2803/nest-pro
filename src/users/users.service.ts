@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, SetMetadata } from '@nestjs/common';
-import { CodeAuthDto, CreateUserDto, RegisterUserDto } from './dto/create-user.dto';
+import { CodeAuthDto, CodeResetPasswordDto, CreateUserDto, RegisterUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from './schemas/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
@@ -214,7 +214,7 @@ export class UsersService {
     }
   }
 
-  handleRetryActive = async (email: string) => {
+  handleRetryCode = async (email: string) => {
     const isExist = await this.userModel.findOne(
       {
         email: email
@@ -230,18 +230,37 @@ export class UsersService {
         codeExpire: dayjs().add(5, 'minutes')
       }
     )
+    
     this.mailerService.sendMail({
-      to: email, // list of receivers
-      from: '"Kích hoạt tài khoản" <abc@gmail.com>', // sender address
-      subject: 'Xác thực tài khoản ✔', // Subject line
-      template: 'verifyCode',
-      context: {
+      to: email, 
+      from: isExist.isActive ? '"Request to retrieve password" <abc@gmail.com>' :  '"Verify account" <abc@gmail.com>',
+      subject:isExist.isActive ? 'Create a new password ✔' :  'Verify account ✔',
+      template: isExist.isActive ? "resetPassword": "verifyCode",
+      context: { 
         receiver: isExist?.name ?? isExist.email,
         activeCode: codeId
       }
     })
     return {
       _id: isExist._id
+    }
+  }
+
+  handleResetPassword = async (data: CodeResetPasswordDto) => {
+    const user = await this.userModel.findOne({
+      _id: data._id,
+      codeId: data.codeId
+    })
+    const hashPassword = this.hashPassword(data.password);
+   
+    if(!user){
+      throw new BadRequestException('Invalid data!');
+    }
+    const isBeforeCheck = dayjs().isBefore(user.codeExpire);
+    if(isBeforeCheck){
+      return await this.userModel.updateOne({_id: data._id}, {password: hashPassword});
+    }else{
+      throw new BadRequestException('Invalid data!');
     }
   }
 

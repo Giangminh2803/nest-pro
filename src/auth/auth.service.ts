@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { IUser } from 'src/users/user.interface';
-import { CodeAuthDto, RegisterUserDto } from 'src/users/dto/create-user.dto';
+import { CodeAuthDto, CodeResetPasswordDto, RegisterUserDto } from 'src/users/dto/create-user.dto';
 import { ConfigService } from '@nestjs/config';
 import ms from 'ms';
 import { response, Response } from 'express';
@@ -96,7 +96,11 @@ export class AuthService {
         return this.usersService.handleActive(codeAuthDto);
     }
     async retryCode(email: string) {
-        return this.usersService.handleRetryActive(email);
+        return this.usersService.handleRetryCode(email);
+    }
+
+    async resetPassword(codeResetPasswordDto: CodeResetPasswordDto) {
+        return this.usersService.handleResetPassword(codeResetPasswordDto);
     }
 
     createRefreshToken = (payload) => {

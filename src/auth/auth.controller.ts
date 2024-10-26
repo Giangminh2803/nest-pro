@@ -2,7 +2,7 @@ import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common
 import { Public, ResponseMessage, User } from 'src/decorator/customize';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
-import { CodeAuthDto, RegisterUserDto } from 'src/users/dto/create-user.dto';
+import { CodeAuthDto, CodeResetPasswordDto, RegisterUserDto } from 'src/users/dto/create-user.dto';
 import { Request, Response } from 'express';
 import { IUser } from 'src/users/user.interface';
 import { RoleService } from 'src/role/role.service';
@@ -61,6 +61,13 @@ export class AuthController {
     @Post('/check-code')
     handleCheckCode(@Body() codeAuthDto: CodeAuthDto) {
         return this.authService.checkCode(codeAuthDto);
+    }
+
+    @Public()
+    @ResponseMessage('Create new password success!')
+    @Post('/reset-password')
+    handleResetPassword(@Body() codeResetPasswordDto: CodeResetPasswordDto) {
+        return this.authService.resetPassword(codeResetPasswordDto);
     }
 
     @Public()

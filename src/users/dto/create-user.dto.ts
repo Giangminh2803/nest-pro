@@ -92,3 +92,16 @@ export class CodeAuthDto {
     codeId: string
 
 }
+
+export class CodeResetPasswordDto {
+    
+    @IsString()
+    _id: string
+
+    @IsString()
+    codeId: string
+
+    @IsString()
+    password: string
+
+}
