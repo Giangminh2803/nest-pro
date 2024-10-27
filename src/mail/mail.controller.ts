@@ -31,71 +31,14 @@ export class MailController {
   @Public()
   @ResponseMessage('Test Email')
   async handleTestEmail() {
-
-    const userRole = await this.roleModel.findOne({ name: USER_ROLE });
-    const users = await this.userModel.find({ role: userRole?._id }).select('-password');
-
-
-    for (const user of users) {
-
-
-      const invoiceWithUserId = await this.invoiceModel.find({ "tenant._id": user.id });
-
-      if (invoiceWithUserId?.length) {
-        let totalMoney: number = 0;
-        let bill = invoiceWithUserId.map(item => {
-
-          if (item.status === 'UNPAID') {
-            totalMoney += item.amount;
-
-
-            return {
-              id: item._id.toString(),
-              month: item.month,
-              service: item.service.name,
-              room: item.room?.roomName,
-              unit: item.service.unit,
-              firstIndex: item?.firstIndex,
-              finalIndex: item?.finalIndex,
-              price: item.service.priceUnit.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + "đ",
-              total: item?.totalNumber,
-              money: item?.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + "đ"
-
-            }
-          }
-
-        })
-
-        await this.mailerService.sendMail({
-          to: 'dogiang122003@gmail.com',
-          from: '"Thông báo hoá đơn" <abc@gmail.com>',
-          subject: "Hoá đơn dịch vụ",
-          template: 'test',
-          context: {
-            receiver: user.name,
-            bills: bill,
-            total: totalMoney.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + " đ"
-          }
-
-        })
-
-      }
-    }
-
-
-
-
-
-
-
-
+    return await this.mailService.handleTestEmail();
   }
 
   @Post()
   @Public()
   @ResponseMessage('Test Email')
   async handleSendCodeVerifyEmail() {
- 
+  
     await this.mailerService.sendMail({
       to: 'dogiang122003@gmail.com',
       from: '"Kích hoạt tài khoản" <abc@gmail.com>',

@@ -19,6 +19,9 @@ import { MailModule } from './mail/mail.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
 import { APP_GUARD } from '@nestjs/core';
+import { PayController } from './pay/pay.controller';
+import { PayModule } from './pay/pay.module';
+
 
 
 @Module({
@@ -26,7 +29,7 @@ import { APP_GUARD } from '@nestjs/core';
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([{
       ttl: 60000,
-      limit: 10,
+      limit: 999,
     }]),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
@@ -53,7 +56,8 @@ import { APP_GUARD } from '@nestjs/core';
     PermissionModule,
     RoleModule,
     DatabasesModule,
-    MailModule
+    MailModule,
+    PayModule
   ],
   controllers: [AppController],
 

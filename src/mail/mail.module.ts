@@ -12,9 +12,12 @@ import { UsersModule } from 'src/users/users.module';
 import { Role, RoleSchema } from 'src/role/schemas/role.schema';
 import { Service, ServiceSchema } from 'src/services/schemas/service.schema';
 import { InvoicesService } from 'src/invoices/invoices.service';
+import { Pay, PaySchema } from 'src/pay/schemas/pay.schema';
+import { PayModule } from 'src/pay/pay.module';
 
 @Module({
-  imports: [ 
+  imports: [
+     PayModule,
     MailerModule.forRootAsync({
      
       useFactory: async (configService: ConfigService) => ({
@@ -44,7 +47,7 @@ import { InvoicesService } from 'src/invoices/invoices.service';
       { name: User.name, schema: UserSchema },
       { name: Role.name, schema: RoleSchema },
       { name: Service.name, schema: ServiceSchema },
-
+      { name: Pay.name, schema: PaySchema },
     ]),
 
 

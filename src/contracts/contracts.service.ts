@@ -131,6 +131,6 @@ export class ContractsService {
   async autoUpdateStatus(user: IUser) {
     const today = new Date();
     await this.contractModel.updateMany({endDate: {$lt: today}}, {status: "EXPIRED"})
-   console.log('call me');
+   
 }
 }

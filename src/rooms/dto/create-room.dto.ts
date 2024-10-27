@@ -12,6 +12,7 @@ export class CreateRoomDto {
     @IsString()
     status: string;
 
+    @IsOptional()
     @IsNumber()
     price: number;
 

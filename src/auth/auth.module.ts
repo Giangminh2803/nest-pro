@@ -18,7 +18,8 @@ import { ThrottlerGuard } from '@nestjs/throttler';
 
   
 
-  imports: [UsersModule,
+  imports: [
+    UsersModule,
     PassportModule,
     RoleModule,
     JwtModule.registerAsync({
