@@ -11,11 +11,14 @@ import { User, UserDocument } from 'src/users/schemas/user.schema';
 import { Room, RoomDocument } from 'src/rooms/schemas/room.schema';
 import { RoleDocument } from 'src/role/schemas/role.schema';
 import { Cron } from '@nestjs/schedule';
+import dayjs from 'dayjs';
+import { MailerService } from '@nestjs-modules/mailer';
 
 
 @Injectable()
 export class ContractsService {
   constructor(
+    private mailerService: MailerService,
     @InjectModel(Contract.name) private contractModel: SoftDeleteModel<ContractDocument>,
     @InjectModel(User.name) private userModel: SoftDeleteModel<UserDocument>,
     @InjectModel(Room.name) private roomModel: SoftDeleteModel<RoomDocument>) { }
@@ -91,6 +94,13 @@ export class ContractsService {
     return await this.contractModel.find({ "tenant._id": id })
 
   }
+  async findByTenantIdAndContractActive(id: string) {
+    if (!mongoose.isValidObjectId(id)) {
+      throw new BadRequestException('Id is not valid!')
+    }
+    return await this.contractModel.find({ "tenant._id": id , status: 'ACTIVE'})
+
+  }
 
   async update(id: string, updateContractDto: UpdateContractDto, user: IUser) {
     if (!mongoose.isValidObjectId(id)) {
@@ -127,10 +137,36 @@ export class ContractsService {
     return await this.contractModel.softDelete({ _id: id });
   }
 
-  @Cron('0 6 * * * *')
+  @Cron('0 6 * * * *') 
   async autoUpdateStatus(user: IUser) {
     const today = new Date();
     await this.contractModel.updateMany({endDate: {$lt: today}}, {status: "EXPIRED"})
-   
 }
+
+// @Cron('*/10 * * * * *')
+async autoSendEmailExpire() {
+  const expireMonthDown = dayjs().add(45, 'days');
+  const expireMonthUp = dayjs(expireMonthDown).add(1, 'days');
+  const contracts = await this.contractModel.find({endDate: {$gte: expireMonthDown, $lt: expireMonthUp}, status: 'ACTIVE'})
+   for(const contract of contracts){
+    await this.mailerService.sendMail({
+      to: contract.tenant.email,
+      from: '"Thông báo gia hạn hợp đồng" <abc@gmail.com>',
+      subject: "Gia Hạn Hợp Đồng",
+      template: 'expireContract.hbs',
+      context: {
+        receiver: contract.tenant.name,
+        startDate: dayjs(contract.startDate).format('DD/MM/YYYY'),
+        endDate: dayjs(contract.endDate).format('DD/MM/YYYY'),
+        location: contract.room.roomName,
+        price: contract.room.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + " đ",
+      
+      }
+
+    })
+   }
+   console.log('call me');
+ 
+}
+
 }

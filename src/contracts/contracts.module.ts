@@ -17,5 +17,6 @@ import { Room, RoomSchema } from 'src/rooms/schemas/room.schema';
   ],
   controllers: [ContractsController],
   providers: [ContractsService],
+  exports: [ContractsService]
 })
 export class ContractsModule {}

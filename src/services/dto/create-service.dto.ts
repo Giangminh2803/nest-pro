@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsDefined, IsEmail, IsInt, IsNotEmpty, IsNotEmptyObject, IsNumber, IsNumberString, IsObject, IsString, ValidateNested } from "class-validator"
+import { IsArray, IsDefined, IsEmail, IsInt, IsNotEmpty, IsNotEmptyObject, IsNumber, IsNumberString, IsObject, IsString, ValidateNested } from "class-validator"
 
 
 export class CreateServiceDto {
@@ -18,4 +18,5 @@ export class CreateServiceDto {
     @IsString()
     type: string;
 
+   
 }

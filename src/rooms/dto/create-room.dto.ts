@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsDefined, IsEmail, IsInt, IsNotEmpty, IsNotEmptyObject, IsNumber, IsNumberString, IsObject, IsOptional, IsString, ValidateNested } from "class-validator"
+import { IsArray, IsDefined, IsEmail, IsInt, IsNotEmpty, IsNotEmptyObject, IsNumber, IsNumberString, IsObject, IsOptional, IsString, ValidateNested } from "class-validator"
 
 export class CreateRoomDto {
     @IsString()
@@ -15,6 +15,11 @@ export class CreateRoomDto {
     @IsOptional()
     @IsNumber()
     price: number;
+
+    @IsArray()
+    @IsString({ each: true })
+    services: string[];
+
 
     
 }

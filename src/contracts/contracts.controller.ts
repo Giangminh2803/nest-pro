@@ -44,4 +44,10 @@ export class ContractsController {
     return this.contractsService.remove(id, user);
   }
 
+  @Public()
+  @ResponseMessage('Fetch data Contracts by Tenant!')
+  @Post("/expire")
+  expire() {
+    return this.contractsService.autoSendEmailExpire();
+  }
 }

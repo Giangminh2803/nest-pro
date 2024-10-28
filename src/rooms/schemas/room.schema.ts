@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
+import { Service } from 'src/services/schemas/service.schema';
 
 export type RoomDocument = HydratedDocument<Room>;
 
@@ -20,8 +21,8 @@ export class Room {
   @Prop()
   description: string;
 
-  @Prop({ type: mongoose.Schema.Types.Array })
-  equipments : mongoose.Schema.Types.ObjectId[] ;
+  @Prop({ type: mongoose.Schema.Types.Array, ref: Service.name })
+  services : mongoose.Schema.Types.ObjectId[] ;
 
   @Prop()
   createdAt: Date;

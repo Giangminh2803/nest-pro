@@ -69,8 +69,8 @@ export class CreateInvoiceDto {
     finalIndex: number;
 
     @IsOptional()
-    @IsNumber()
-    month: number;
+    @IsString()
+    month: string;
 
     @IsOptional()
     @IsString()

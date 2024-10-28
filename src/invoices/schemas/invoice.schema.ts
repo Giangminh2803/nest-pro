@@ -48,7 +48,7 @@ export class Invoice {
     totalNumber: number;
 
     @Prop()
-    month: number;
+    month: string;
 
     @Prop()
     description: string;

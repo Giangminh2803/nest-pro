@@ -20,6 +20,7 @@ export class Contract {
     @Prop({type: Object})
     tenant: {
         _id: mongoose.Schema.Types.ObjectId;
+        email: string,
         name: string,
         idCard: string,
         phone: string

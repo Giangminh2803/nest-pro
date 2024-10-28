@@ -1,6 +1,6 @@
 
 import { Type } from "class-transformer";
-import { IsDate, IsDateString, IsDefined, IsNotEmptyObject, IsNumber, IsNumberString, IsObject, IsOptional, IsString, Length, length, ValidateNested, } from "class-validator"
+import { IsDate, IsDateString, IsDefined, IsEmail, IsNotEmptyObject, IsNumber, IsNumberString, IsObject, IsOptional, IsString, Length, length, ValidateNested, } from "class-validator"
 import { RmOptions } from "fs";
 import mongoose from "mongoose";
 
@@ -21,6 +21,10 @@ class tenantDTO {
 
     @IsString()
     name: string
+    
+    @IsEmail()
+    @IsString()
+    email: string
 
     @IsNumberString()
     @Length(12)

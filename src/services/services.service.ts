@@ -69,6 +69,12 @@ export class ServicesService {
     }
     return await this.serviceModel.findOne({_id: id}); ;
   }
+  async findOtherService(id: string) {
+    if(!mongoose.isValidObjectId(id)){
+      throw new BadRequestException('Id Room is not valid!')
+    }
+    return await this.serviceModel.findOne({_id: id}); ;
+  }
 
   async update(id: string, updateServiceDto: UpdateServiceDto, user: IUser
   ) {
