@@ -27,15 +27,15 @@ export class ContractsService {
     const isExist = await this.roomModel.findOne({
       _id: createContractDto.room._id,
       status: "OCCUPIED"
-      }
+    }
     );
     if (isExist) {
       throw new BadRequestException('Data is not valid!');
     }
-    
+
     const contract = await this.contractModel.create({
       ...createContractDto,
-      innkeeper:{
+      innkeeper: {
         _id: user._id,
         name: user.name,
         phone: user.phone,
@@ -48,7 +48,26 @@ export class ContractsService {
       }
     })
 
-    await this.roomModel.updateOne({_id: createContractDto.room._id}, {status: "OCCUPIED"});
+    const startDate = dayjs(contract.startDate);
+    const endDate = dayjs(contract.endDate);
+
+  
+    const invoiceDetails = [];
+    let currentDate = startDate;
+    while (currentDate.isBefore(endDate)) {
+      let nextDate = currentDate.add(contract.rentCycleCount, 'month');
+      if (nextDate.isAfter(endDate)) {
+        nextDate = endDate;
+      }
+      const months = nextDate.diff(currentDate, 'month', true);
+      invoiceDetails.push({
+        date: currentDate.format('YYYY-MM-DD'),
+        months: months,
+      });
+      currentDate = nextDate;
+    }
+    await this.contractModel.updateOne({ _id: contract._id }, { invoiceDetails: invoiceDetails });
+    await this.roomModel.updateOne({ _id: createContractDto.room._id }, { status: "OCCUPIED" });
 
     return {
       _id: contract._id,
@@ -98,7 +117,13 @@ export class ContractsService {
     if (!mongoose.isValidObjectId(id)) {
       throw new BadRequestException('Id is not valid!')
     }
-    return await this.contractModel.find({ "tenant._id": id , status: 'ACTIVE'})
+    return await this.contractModel.find({ "tenant._id": id, status: 'ACTIVE' })
+
+  }
+
+  async findContractActive() {
+    const today = dayjs();
+    return await this.contractModel.find({ status: 'ACTIVE', endDate: { $gte: today } });
 
   }
 
@@ -137,36 +162,36 @@ export class ContractsService {
     return await this.contractModel.softDelete({ _id: id });
   }
 
-  @Cron('0 6 * * * *') 
+  @Cron('0 6 * * * *')
   async autoUpdateStatus(user: IUser) {
     const today = new Date();
-    await this.contractModel.updateMany({endDate: {$lt: today}}, {status: "EXPIRED"})
-}
+    await this.contractModel.updateMany({ endDate: { $lt: today } }, { status: "EXPIRED" })
+  }
 
-// @Cron('*/10 * * * * *')
-async autoSendEmailExpire() {
-  const expireMonthDown = dayjs().add(45, 'days');
-  const expireMonthUp = dayjs(expireMonthDown).add(1, 'days');
-  const contracts = await this.contractModel.find({endDate: {$gte: expireMonthDown, $lt: expireMonthUp}, status: 'ACTIVE'})
-   for(const contract of contracts){
-    await this.mailerService.sendMail({
-      to: contract.tenant.email,
-      from: '"Thông báo gia hạn hợp đồng" <abc@gmail.com>',
-      subject: "Gia Hạn Hợp Đồng",
-      template: 'expireContract.hbs',
-      context: {
-        receiver: contract.tenant.name,
-        startDate: dayjs(contract.startDate).format('DD/MM/YYYY'),
-        endDate: dayjs(contract.endDate).format('DD/MM/YYYY'),
-        location: contract.room.roomName,
-        price: contract.room.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + " đ",
-      
-      }
+  // @Cron('*/10 * * * * *')
+  async autoSendEmailExpire() {
+    const expireMonthDown = dayjs().add(45, 'days');
+    const expireMonthUp = dayjs(expireMonthDown).add(1, 'days');
+    const contracts = await this.contractModel.find({ endDate: { $gte: expireMonthDown, $lt: expireMonthUp }, status: 'ACTIVE' })
+    for (const contract of contracts) {
+      await this.mailerService.sendMail({
+        to: contract.tenant.email,
+        from: '"Thông báo gia hạn hợp đồng" <abc@gmail.com>',
+        subject: "Gia Hạn Hợp Đồng",
+        template: 'expireContract.hbs',
+        context: {
+          receiver: contract.tenant.name,
+          startDate: dayjs(contract.startDate).format('DD/MM/YYYY'),
+          endDate: dayjs(contract.endDate).format('DD/MM/YYYY'),
+          location: contract.room.roomName,
+          price: contract.room.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + " đ",
 
-    })
-   }
-   console.log('call me');
- 
-}
+        }
+
+      })
+    }
+    console.log('call me');
+
+  }
 
 }

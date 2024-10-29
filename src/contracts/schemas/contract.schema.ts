@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
-import { Room, RoomSchema } from 'src/rooms/schemas/room.schema';
-import { User } from 'src/users/schemas/user.schema';
+
 
 export type ContractDocument = HydratedDocument<Contract>;
 
@@ -37,6 +36,15 @@ export class Contract {
 
     @Prop()
     numberPeople: number
+    
+    @Prop()
+    invoiceDetails:[{
+        date: Date,
+        months: number
+    }]
+
+    @Prop()
+    rentCycleCount: number
 
     @Prop()
     startDate: Date;

@@ -51,12 +51,13 @@ export class Invoice {
     month: string;
 
     @Prop()
+    invoiceDate: Date;
+
+    @Prop()
     description: string;
 
     @Prop()
     amount: number;
-
-
 
     @Prop()
     status: string;

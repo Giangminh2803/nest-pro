@@ -58,6 +58,7 @@ export class CreateInvoiceDto {
     @IsObject()
     @ValidateNested()
     @Type(() => serviceDTO)
+    @IsOptional()
     service: serviceDTO;
 
     @IsNumber()
@@ -83,6 +84,8 @@ export class CreateInvoiceDto {
     @IsOptional()
     @IsDateString()
     dueDate: Date;
+
+   
 
     
 }

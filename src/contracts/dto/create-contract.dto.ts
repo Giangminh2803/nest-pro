@@ -63,6 +63,9 @@ export class CreateContractDto {
     depositAmount: number
 
 
+    @IsNumber()
+    rentCycleCount: number
+
     @IsString()
     status: string;
 

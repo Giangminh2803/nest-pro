@@ -19,8 +19,8 @@ import { MailModule } from './mail/mail.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
 import { APP_GUARD } from '@nestjs/core';
-import { PayController } from './pay/pay.controller';
 import { PayModule } from './pay/pay.module';
+
 
 
 
@@ -57,7 +57,8 @@ import { PayModule } from './pay/pay.module';
     RoleModule,
     DatabasesModule,
     MailModule,
-    PayModule
+    PayModule,
+    ConfigModule
   ],
   controllers: [AppController],
 
