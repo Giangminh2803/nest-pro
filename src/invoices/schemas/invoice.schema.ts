@@ -49,6 +49,9 @@ export class Invoice {
 
     @Prop()
     month: string;
+ 
+    @Prop()
+    send: boolean;
 
     @Prop()
     invoiceDate: Date;
@@ -62,8 +65,7 @@ export class Invoice {
     @Prop()
     status: string;
 
-    @Prop()
-    dueDate: Date;
+  
 
     @Prop()
     createdAt: Date;

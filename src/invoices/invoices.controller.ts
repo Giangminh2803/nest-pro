@@ -3,7 +3,7 @@ import { InvoicesService } from './invoices.service';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { UpdateInvoiceDto } from './dto/update-invoice.dto';
 import { IUser } from 'src/users/user.interface';
-import { ResponseMessage, User } from 'src/decorator/customize';
+import { Public, ResponseMessage, User } from 'src/decorator/customize';
 
 @Controller('invoices')
 export class InvoicesController {
@@ -41,5 +41,12 @@ export class InvoicesController {
   @Delete(':id')
   remove(@Param('id') id: string, @User() user: IUser) {
     return this.invoicesService.remove(id, user);
+  }
+
+  @ResponseMessage('Test')
+  @Post('/test')
+  @Public()
+  Test() {
+    return this.invoicesService.autoCreateInvoice();
   }
 }

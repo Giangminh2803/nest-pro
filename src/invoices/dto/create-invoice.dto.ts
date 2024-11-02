@@ -81,11 +81,5 @@ export class CreateInvoiceDto {
     @IsOptional()
     status: string;
 
-    @IsOptional()
-    @IsDateString()
-    dueDate: Date;
-
-   
-
     
 }

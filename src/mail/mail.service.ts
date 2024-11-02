@@ -13,9 +13,9 @@ import { User, UserDocument } from 'src/users/schemas/user.schema';
 
 @Injectable()
 export class MailService {
-    constructor(
-        private mailerService: MailerService,
-        private payService: PayService,
+  constructor(
+    private mailerService: MailerService,
+    private payService: PayService,
     @InjectModel(User.name)
     private userModel: SoftDeleteModel<UserDocument>,
 
@@ -29,61 +29,58 @@ export class MailService {
 
     @InjectModel(Pay.name)
     private payModel: SoftDeleteModel<PayDocument>
-    ){}
+  ) { }
 
-    async handleTestEmail() {
-        const userRole = await this.roleModel.findOne({ name: USER_ROLE });
-        const users = await this.userModel.find({ role: userRole?._id }).select('-password');
-        for (const user of users) {
-          const invoiceWithUserId = await this.invoiceModel.find({ "tenant._id": user.id });
-          if (invoiceWithUserId?.length) {
-            let totalMoney: number = 0;
-            let bill = invoiceWithUserId.map(item => {
-              if (item.status === 'UNPAID') {
-                totalMoney += item.amount;
-                return {
-                  id: item._id.toString(),
-                  month: item.month,
-                  service: item.service.name,
-                  room: item.room?.roomName,
-                  unit: item.service.unit, 
-                  firstIndex: item?.firstIndex, 
-                  finalIndex: item?.finalIndex,
-                  price: item.service.priceUnit.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + "đ",
-                  total: item?.totalNumber,
-                  money: item?.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + "đ"
-                }
-              }
-            })
-            const payment: IPayment = {
-                amount: totalMoney,
-                description: 'Thanh toán hoá đơn'
-            };
-            const paymentLink = await this.payService.handlePayment(payment);
-              
-            await this.mailerService.sendMail({
-              to: 'dogiang122003@gmail.com',
-              from: '"Thông báo hoá đơn" <abc@gmail.com>',
-              subject: "Hoá đơn dịch vụ",
-              template: 'invoiceT.hbs',
-              context: {
-                receiver: user.name,
-                bills: bill,
-                paymentLink: paymentLink.checkoutUrl,
-                total: totalMoney.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + " đ"
-              }
-    
-            })
-    
+  async handleTestEmail() {
+    const userRole = await this.roleModel.findOne({ name: USER_ROLE });
+    const users = await this.userModel.find({ role: userRole?._id }).select('-password');
+
+    for (const user of users) {
+      const invoiceWithUserId = await this.invoiceModel.find({ "tenant._id": user._id, send: false });
+      if (invoiceWithUserId?.length > 0) {
+        let totalMoney: number = 0;
+        let invoices = invoiceWithUserId.map(item => {
+          if (item.status === 'UNPAID') {
+            totalMoney += item.amount;
+            return {
+              id: item._id,
+              month: item.month,
+              service: item.service.name,
+              room: item.room?.roomName,
+              unit: item.service.unit,
+              firstIndex: item?.firstIndex,
+              finalIndex: item?.finalIndex,
+              price: item.service.priceUnit.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + "đ",
+              total: item?.totalNumber,
+              money: item?.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + "đ"
+            }
           }
+        })
+        if (invoices && invoices.length > 0) {
+          const payment: IPayment = {
+            amount: totalMoney,
+            description: 'Thanh toán hoá đơn'
+          };
+          const paymentLink = await this.payService.handlePayment(payment);
+
+          for (const invoice of invoices) {
+            await this.invoiceModel.updateOne({ _id: invoice.id }, { send: true });
+          }
+          await this.mailerService.sendMail({
+            to: user.email,
+            from: '"Thông báo hoá đơn" <abc@gmail.com>',
+            subject: "Hoá đơn dịch vụ",
+            template: 'invoiceT.hbs',
+            context: {
+              receiver: user.name,
+              bills: invoices,
+              paymentLink: paymentLink.checkoutUrl,
+              total: totalMoney.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + " đ"
+            }
+
+          })
         }
-    
-    
-    
-    
-    
-    
-    
-    
       }
+    }
+  }
 }

@@ -7,25 +7,32 @@ import { InjectModel } from '@nestjs/mongoose';
 import { IUser } from 'src/users/user.interface';
 import mongoose from 'mongoose';
 import aqp from 'api-query-params';
+import { ContractsService } from 'src/contracts/contracts.service';
 
 @Injectable()
 export class RoomsService {
-  constructor(@InjectModel(Room.name) private roomModel: SoftDeleteModel<RoomDocument>) { }
+  constructor(
+    @InjectModel(Room.name) private roomModel: SoftDeleteModel<RoomDocument>,
+    private contractService: ContractsService,
+
+  ) { }
 
   async create(createRoomDto: CreateRoomDto, user: IUser) {
-    const isRoomExist = await this.roomModel.findOne({roomName: createRoomDto.roomName});
-    if(!isRoomExist){
-      const room = await this.roomModel.create({...createRoomDto, createdBy: {
-        _id: user._id,
-        email: user.email,
-        name: user.name
-      }});
+    const isRoomExist = await this.roomModel.findOne({ roomName: createRoomDto.roomName });
+    if (!isRoomExist) {
+      const room = await this.roomModel.create({
+        ...createRoomDto, createdBy: {
+          _id: user._id,
+          email: user.email,
+          name: user.name
+        }
+      });
       return {
         _id: room._id,
         createdAt: room.createdAt
       }
     }
-    
+
     throw new BadRequestException('Room number already exists');
   }
 
@@ -60,22 +67,30 @@ export class RoomsService {
 
   }
 
-  findById(id: string){
-    if(!mongoose.isValidObjectId(id)){
+  findById(id: string) {
+    if (!mongoose.isValidObjectId(id)) {
       throw new BadRequestException('Id Room is not valid!')
     }
-  
-    return this.roomModel.findOne({_id: id});
+
+    return this.roomModel.findOne({ _id: id });
 
   }
 
-  
+
 
   async update(id: string, updateRoomDto: UpdateRoomDto, user: IUser) {
-    if(!mongoose.isValidObjectId(id)){
+    if (!mongoose.isValidObjectId(id)) {
       throw new BadRequestException('Id Room is not valid!')
     }
-    const room = await this.roomModel.updateOne({_id: id}, {
+
+    if (updateRoomDto.status === "ACTIVE") {
+      const isExist = await this.contractService.findRoomInContractActive(id);
+      if (isExist) {
+        throw new BadRequestException('Room has been rented!');
+      }
+    }
+    
+    const room = await this.roomModel.updateOne({ _id: id }, {
       ...updateRoomDto,
       updatedBy: {
         _id: user._id,
@@ -87,10 +102,10 @@ export class RoomsService {
   }
 
   async remove(id: string, user: IUser) {
-    if(!mongoose.isValidObjectId(id)){
+    if (!mongoose.isValidObjectId(id)) {
       throw new BadRequestException('Id Room is not valid!')
     }
-    await this.roomModel.updateOne({_id: id}, {
+    await this.roomModel.updateOne({ _id: id }, {
       deletedBy: {
         _id: user._id,
         email: user.email,
@@ -98,6 +113,6 @@ export class RoomsService {
       }
     })
 
-    return await this.roomModel.softDelete({_id: id});
+    return await this.roomModel.softDelete({ _id: id });
   }
 }

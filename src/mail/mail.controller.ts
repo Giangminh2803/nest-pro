@@ -7,7 +7,7 @@ import { User, UserDocument } from 'src/users/schemas/user.schema';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { Invoice, InvoiceDocument } from 'src/invoices/schemas/invoice.schema';
 import { Role, RoleDocument } from 'src/role/schemas/role.schema';
-import { USER_ROLE } from 'src/databases/sample';
+
 import { Service, ServiceDocument } from 'src/services/schemas/service.schema';
 
 @Controller('mail')

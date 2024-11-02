@@ -22,7 +22,8 @@ export class Contract {
         email: string,
         name: string,
         idCard: string,
-        phone: string
+        phone: string,
+        address: string
     }
 
 
@@ -57,6 +58,9 @@ export class Contract {
 
     @Prop()
     description: string;
+
+    @Prop()
+    address: string;
 
     @Prop()
     status: string;

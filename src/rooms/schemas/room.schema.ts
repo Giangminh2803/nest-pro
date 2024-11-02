@@ -16,6 +16,9 @@ export class Room {
   status: string;
 
   @Prop()
+  area: number;
+
+  @Prop()
   price: number;
 
   @Prop()

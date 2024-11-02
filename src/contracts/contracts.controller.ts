@@ -46,8 +46,8 @@ export class ContractsController {
 
   @Public()
   @ResponseMessage('Fetch data Contracts by Tenant!')
-  @Post("/expire")
-  expire() {
-    return this.contractsService.autoSendEmailExpire();
+  @Post("/expire/:id")
+  expire(@Param('id') id: string) {
+    return this.contractsService.findByTenantIdAndContractActive(id);
   }
 }

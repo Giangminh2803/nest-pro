@@ -59,7 +59,7 @@ export class ContractsService {
       if (nextDate.isAfter(endDate)) {
         nextDate = endDate;
       }
-      const months = nextDate.diff(currentDate, 'month', true);
+      const months = Math.ceil(nextDate.diff(currentDate, 'month', true));
       invoiceDetails.push({
         date: currentDate.format('YYYY-MM-DD'),
         months: months,
@@ -117,13 +117,19 @@ export class ContractsService {
     if (!mongoose.isValidObjectId(id)) {
       throw new BadRequestException('Id is not valid!')
     }
-    return await this.contractModel.find({ "tenant._id": id, status: 'ACTIVE' })
-
+    const day = dayjs().startOf('day');
+    const tomorrow = day.add(1, "day").startOf('day').date();
+    return await this.contractModel.find({ "tenant._id": id, status: 'ACTIVE' });
   }
 
   async findContractActive() {
     const today = dayjs();
     return await this.contractModel.find({ status: 'ACTIVE', endDate: { $gte: today } });
+
+  }
+  async findRoomInContractActive(id: string) {
+   
+    return await this.contractModel.findOne({"room._id": id , status: 'ACTIVE' });
 
   }
 
@@ -163,12 +169,14 @@ export class ContractsService {
   }
 
   @Cron('0 6 * * * *')
-  async autoUpdateStatus(user: IUser) {
-    const today = new Date();
-    await this.contractModel.updateMany({ endDate: { $lt: today } }, { status: "EXPIRED" })
+  async autoUpdateStatus() {
+    const today = dayjs().startOf('day');
+    await this.contractModel.updateMany({ endDate: { $lt: today }, status: "ACTIVE" }, { status: "EXPIRED" })
   }
 
-  // @Cron('*/10 * * * * *')
+  
+
+  @Cron('0 10 * * *')
   async autoSendEmailExpire() {
     const expireMonthDown = dayjs().add(45, 'days');
     const expireMonthUp = dayjs(expireMonthDown).add(1, 'days');
@@ -190,7 +198,7 @@ export class ContractsService {
 
       })
     }
-    console.log('call me');
+    
 
   }
 

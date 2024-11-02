@@ -13,8 +13,8 @@ import dayjs from 'dayjs';
 import { UsersService } from 'src/users/users.service';
 import { ContractsService } from 'src/contracts/contracts.service';
 import { RoomsService } from 'src/rooms/rooms.service';
-import { time } from 'console';
 
+ 
 @Injectable()
 export class InvoicesService {
   constructor(
@@ -27,11 +27,9 @@ export class InvoicesService {
 
 
   async updateData(_id: string, data: any) {
-
-
     const service = await this.servicesService.findOne(data.serviceId);
 
-    if (service.type === 'E&W') {
+    if (service.type === 'WATER' || service.type === 'ELECTRICITY') {
       const totalNumber = data.finalIndex - data.firstIndex;
       await this.invoiceModel.updateOne({ _id: _id },
         {
@@ -53,7 +51,6 @@ export class InvoicesService {
     if (createInvoiceDto.finalIndex - createInvoiceDto.firstIndex < 0) {
       throw new BadRequestException('Data is not valid!')
     }
-
     const service = await this.servicesService.findOne(createInvoiceDto.service._id.toString());
     let totalNumber: number;
     if (service.type === "ELECTRICITY" || service.type === "WATER") {
@@ -68,6 +65,7 @@ export class InvoicesService {
       status: "UNPAID",
       totalNumber: totalNumber,
       amount: price,
+      send: false,
       priceUnit: service.price,
       createdBy: {
         _id: user._id,
@@ -83,7 +81,8 @@ export class InvoicesService {
     };
   }
 
-  @Cron('0 0 1 * *')
+  //@Cron('0 0 * * *')
+  //@Cron('* * * * * *')
   async autoCreateInvoice() {
     const date = dayjs().subtract(1, 'month').format('MM-YYYY');
     const users = await this.userService.findUserByRole();
@@ -91,47 +90,64 @@ export class InvoicesService {
       const contracts = await this.contractService.findByTenantIdAndContractActive(user._id.toString());
       if (contracts && contracts.length > 0) {
         for (const contract of contracts) {
-          const room = await this.roomService.findById(contract.room._id.toString());
-          const services = room.services;
-          for (const service of services) {
-            const otherServices = await this.servicesService.findOne(service.toString());
-            if (otherServices.type !== 'WATER' && otherServices.type !== 'ELECTRICITY') {
-              const isExist = await this.invoiceModel.findOne({
-                "room._id:": room._id,
-                "tenant._id": user._id,
-                "service._id": otherServices._id,
-                month: date
-              })
-              if (!isExist) {
-                await this.invoiceModel.create({
+          const isCheck = this.checkDateInvoice(contract.startDate);
+          if (isCheck) {
+            const room = await this.roomService.findById(contract.room._id.toString());
+            const services = room.services;
+            for (const service of services) {
+              const otherServices = await this.servicesService.findOne(service.toString());
+              if (otherServices.type !== 'WATER' && otherServices.type !== 'ELECTRICITY') {
+                const isExist = await this.invoiceModel.findOne({
                   "room._id:": room._id,
                   "tenant._id": user._id,
                   "service._id": otherServices._id,
-                  "room.roomName:": room.roomName,
-                  "tenant.name": user.name,
-                  "service.name": otherServices.serviceName,
-                  "tenant.email": user.email,
-                  "tenant.idCard": user.idCard,
-                  "service.unit": otherServices.unit,
-                  "tenant.phone": user.phone,
-                  "service.priceUnit": otherServices.price,
-                  amount: otherServices.price,
-                  month: date,
-                  status: "UNPAID",
-                  description: `Dịch vụ ${date}`,
-                  dueDate: dayjs().add(10, 'days')
+                  month: date
                 })
+                if (!isExist) {
+                  await this.invoiceModel.create({
+                    "room._id:": room._id,
+                    "tenant._id": user._id,
+                    "service._id": otherServices._id,
+                    "room.roomName:": room.roomName,
+                    "tenant.name": user.name,
+                    "service.name": otherServices.serviceName,
+                    "tenant.email": user.email,
+                    "tenant.idCard": user.idCard,
+                    "service.unit": otherServices.unit,
+                    "tenant.phone": user.phone,
+                    "service.priceUnit": otherServices.price,
+                    amount: otherServices.price,
+                    month: date,
+                    send: false,
+                    status: "UNPAID",
+                    description: `Dịch vụ ${otherServices.serviceName} ${date}`,
+                    
+                  })
+                }
               }
             }
-
           }
 
         }
       }
-
-
     }
-    return;
+    console.log('done create invoice!');
+
+  }
+
+  checkDateInvoice(contractDate: Date) {
+    const today = dayjs().startOf('day');
+    if (today.date() === dayjs(contractDate).startOf('day').date()) {
+      if (today.month() !== dayjs(contractDate).startOf('day').month()) {
+        return true;
+      } else {
+        if (today.year() !== dayjs(contractDate).startOf('day').year()) {
+          return true;
+        }
+
+      }
+    }
+    return false;
   }
 
   @Cron('* 0 0 * * *')
@@ -139,7 +155,6 @@ export class InvoicesService {
     let date = "";
     const today = dayjs().format('YYYY-MM-DD');
     const contracts = await this.contractService.findContractActive();
-    console.log(contracts);
     if (contracts && contracts.length > 0) {
       for (const contract of contracts) {
         for (let i = 1; i <= contract.rentCycleCount; i++) {
@@ -153,42 +168,42 @@ export class InvoicesService {
         })
         if (!isExist) {
           const invoiceDates = contract.invoiceDetails;
-        
-          for(const invoiceDate of invoiceDates){
-           const isCreateDate = dayjs().isSame(invoiceDate.date,'day');
-           
-           if(isCreateDate){
-            const invoiceRent = await this.invoiceModel.create({
-            room: {
-              _id: contract.room._id,
-              roomName: contract.room.roomName
-            },
-            tenant: {
-              _id: contract.tenant._id,
-              name: contract.tenant.name,
-              idCard: contract.tenant.idCard,
-              phone: contract.tenant.phone
-            },
-            service: {
-              _id: contract.room._id,
-              name: "Tiền nhà"
-            },
-            amount: contract.room.price * invoiceDate.months,
-            month: date,
-            dueDate: dayjs().add(7, 'days'),
-            nextPaymentDate: dayjs().add(contract.rentCycleCount, 'months'),
-            status: "UNPAID",
-            description: `Tiền phòng ${contract.room.roomName} tháng ${date}`
-          })
-           }
+
+          for (const invoiceDate of invoiceDates) {
+            const isCreateDate = dayjs().isSame(invoiceDate.date, 'day');
+
+            if (isCreateDate) {
+              const invoiceRent = await this.invoiceModel.create({
+                room: {
+                  _id: contract.room._id,
+                  roomName: contract.room.roomName
+                },
+                tenant: {
+                  _id: contract.tenant._id,
+                  name: contract.tenant.name,
+                  idCard: contract.tenant.idCard,
+                  phone: contract.tenant.phone
+                },
+                service: {
+                  _id: contract.room._id,
+                  name: "Tiền nhà"
+                },
+                send: false,
+                amount: contract.room.price * invoiceDate.months,
+                month: date,
+                nextPaymentDate: dayjs().add(contract.rentCycleCount, 'months'),
+                status: "UNPAID",
+                description: `Tiền phòng ${contract.room.roomName} tháng ${date}`
+              })
+            }
           }
 
-          
+
         }
 
       }
     }
-    
+
 
   }
 

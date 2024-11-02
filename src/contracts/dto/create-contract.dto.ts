@@ -33,6 +33,9 @@ class tenantDTO {
     @IsNumberString()
     @Length(10)
     phone: string
+
+    @IsString()
+    address: string
 }
 export class CreateContractDto {
 
@@ -68,5 +71,8 @@ export class CreateContractDto {
 
     @IsString()
     status: string;
+
+    @IsString()
+    address: string;
 
 }

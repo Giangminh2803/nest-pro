@@ -1,5 +1,5 @@
-import { Type } from "class-transformer";
-import { IsArray, IsDefined, IsEmail, IsInt, IsNotEmpty, IsNotEmptyObject, IsNumber, IsNumberString, IsObject, IsOptional, IsString, ValidateNested } from "class-validator"
+
+import { IsArray, IsNumber, IsOptional, IsString } from "class-validator"
 
 export class CreateRoomDto {
     @IsString()
@@ -11,6 +11,9 @@ export class CreateRoomDto {
 
     @IsString()
     status: string;
+
+    @IsNumber()
+    area: number;
 
     @IsOptional()
     @IsNumber()
