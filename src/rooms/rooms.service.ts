@@ -67,7 +67,7 @@ export class RoomsService {
 
   }
 
-  findById(id: string) {
+  findById(id:string) {
     if (!mongoose.isValidObjectId(id)) {
       throw new BadRequestException('Id Room is not valid!')
     }

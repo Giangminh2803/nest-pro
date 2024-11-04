@@ -37,13 +37,13 @@ export class DatabasesService implements OnModuleInit {
                 await this.permissionModel.insertMany(INIT_PERMISSION);
             }
             if(countRole === 0){
-                const permissions = await this.permissionModel.find({}).select("_id");
+                const permissionsAdmin = await this.permissionModel.find({}).select("_id");
                 await this.roleModel.insertMany([
                     {
                         name: ADMIN_ROLE,
                         description: "Admin full permissions",
                         isActive: true,
-                        permissions: permissions
+                        permissions: permissionsAdmin
 
                     },
                     {

@@ -26,29 +26,6 @@ export class MailController {
     private serviceModel: SoftDeleteModel<ServiceDocument>
   ) { }
 
-
-  @Get()
-  @Public()
-  @ResponseMessage('Test Email')
-  async handleTestEmail() {
-    return await this.mailService.handleTestEmail();
-  }
-
-  @Post()
-  @Public()
-  @ResponseMessage('Test Email')
-  async handleSendCodeVerifyEmail() {
+ 
   
-    await this.mailerService.sendMail({
-      to: 'dogiang122003@gmail.com',
-      from: '"Kích hoạt tài khoản" <abc@gmail.com>',
-      subject: "Mã kích hoạt",
-      template: 'resetPassword',
-      context: {
-        receiver: "Giang",
-        codeId: "123123213213"
-      }
-
-    })
-  }
 }

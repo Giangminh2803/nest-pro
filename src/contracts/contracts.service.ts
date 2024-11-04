@@ -9,11 +9,12 @@ import mongoose from 'mongoose';
 import aqp from 'api-query-params';
 import { User, UserDocument } from 'src/users/schemas/user.schema';
 import { Room, RoomDocument } from 'src/rooms/schemas/room.schema';
-import { RoleDocument } from 'src/role/schemas/role.schema';
+
 import { Cron } from '@nestjs/schedule';
 import dayjs from 'dayjs';
 import { MailerService } from '@nestjs-modules/mailer';
 
+const { ObjectId } = mongoose.Types;
 
 @Injectable()
 export class ContractsService {
@@ -51,7 +52,7 @@ export class ContractsService {
     const startDate = dayjs(contract.startDate);
     const endDate = dayjs(contract.endDate);
 
-  
+
     const invoiceDetails = [];
     let currentDate = startDate;
     while (currentDate.isBefore(endDate)) {
@@ -119,7 +120,15 @@ export class ContractsService {
     }
     const day = dayjs().startOf('day');
     const tomorrow = day.add(1, "day").startOf('day').date();
-    return await this.contractModel.find({ "tenant._id": id, status: 'ACTIVE' });
+    return await this.contractModel.find(
+      {
+        $or: [
+          { "tenant._id": id },
+          { "tenant._id": new ObjectId(id) }
+        ]
+        ,
+        status: 'ACTIVE'
+      });
   }
 
   async findContractActive() {
@@ -128,8 +137,8 @@ export class ContractsService {
 
   }
   async findRoomInContractActive(id: string) {
-   
-    return await this.contractModel.findOne({"room._id": id , status: 'ACTIVE' });
+
+    return await this.contractModel.findOne({ "room._id": id, status: 'ACTIVE' });
 
   }
 
@@ -174,7 +183,7 @@ export class ContractsService {
     await this.contractModel.updateMany({ endDate: { $lt: today }, status: "ACTIVE" }, { status: "EXPIRED" })
   }
 
-  
+
 
   @Cron('0 10 * * *')
   async autoSendEmailExpire() {
@@ -198,7 +207,7 @@ export class ContractsService {
 
       })
     }
-    
+
 
   }
 

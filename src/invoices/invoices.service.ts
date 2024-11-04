@@ -14,7 +14,7 @@ import { UsersService } from 'src/users/users.service';
 import { ContractsService } from 'src/contracts/contracts.service';
 import { RoomsService } from 'src/rooms/rooms.service';
 
- 
+
 @Injectable()
 export class InvoicesService {
   constructor(
@@ -121,7 +121,7 @@ export class InvoicesService {
                     send: false,
                     status: "UNPAID",
                     description: `Dịch vụ ${otherServices.serviceName} ${date}`,
-                    
+
                   })
                 }
               }
@@ -150,7 +150,8 @@ export class InvoicesService {
     return false;
   }
 
-  @Cron('* 0 0 * * *')
+  //@Cron('* 0 0 * * *')
+  //@Cron('* * * * * *')
   async autoCreateInvoiceRent() {
     let date = "";
     const today = dayjs().format('YYYY-MM-DD');
@@ -170,24 +171,23 @@ export class InvoicesService {
           const invoiceDates = contract.invoiceDetails;
 
           for (const invoiceDate of invoiceDates) {
-            const isCreateDate = dayjs().isSame(invoiceDate.date, 'day');
+            const isCreateDate = dayjs('2024-11-02').isSame(invoiceDate.date, 'day');
 
             if (isCreateDate) {
               const invoiceRent = await this.invoiceModel.create({
-                room: {
-                  _id: contract.room._id,
-                  roomName: contract.room.roomName
-                },
-                tenant: {
-                  _id: contract.tenant._id,
-                  name: contract.tenant.name,
-                  idCard: contract.tenant.idCard,
-                  phone: contract.tenant.phone
-                },
-                service: {
-                  _id: contract.room._id,
-                  name: "Tiền nhà"
-                },
+                "room._id": contract.room._id,
+                "room.roomName": contract.room.roomName,
+
+                "tenant._id": contract.tenant._id,
+                " tenant.name": contract.tenant.name,
+                "tenant.idCard": contract.tenant.idCard,
+                "tenant.phone": contract.tenant.phone,
+
+                "service._id": contract.room._id,
+                "service.name": "Tiền nhà",
+                "service.unit": "tháng",
+                "service.priceUnit": contract.room.price,
+
                 send: false,
                 amount: contract.room.price * invoiceDate.months,
                 month: date,
@@ -204,7 +204,7 @@ export class InvoicesService {
       }
     }
 
-
+    console.log("done");
   }
 
 

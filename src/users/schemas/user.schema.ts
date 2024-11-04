@@ -28,6 +28,9 @@ export class User {
   codeId: string;
 
   @Prop()
+  images: { imagePath: string }[];
+
+  @Prop()
   codeExpire: Date;
 
   @Prop()
@@ -36,13 +39,13 @@ export class User {
   @Prop()
   gender: string;
 
-  @Prop({type: mongoose.Schema.Types.ObjectId, ref: Role.name})
-    role: mongoose.Schema.Types.ObjectId;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Role.name })
+  role: mongoose.Schema.Types.ObjectId;
 
   @Prop()
   address: string;
 
- 
+
   @Prop()
   refresh_token: string;
 

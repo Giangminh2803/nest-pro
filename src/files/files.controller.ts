@@ -1,9 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, ParseFilePipeBuilder, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, ParseFilePipeBuilder, HttpStatus, UploadedFiles } from '@nestjs/common';
 import { FilesService } from './files.service';
 import { CreateFileDto } from './dto/create-file.dto';
 import { UpdateFileDto } from './dto/update-file.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { ResponseMessage } from 'src/decorator/customize';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { Public, ResponseMessage } from 'src/decorator/customize';
 
 @Controller('files')
 export class FilesController {
@@ -17,6 +17,14 @@ export class FilesController {
     return {
       fileName: file.filename
     }
+  }
+
+  @Public()
+  @Post('multiple')
+  @UseInterceptors(FilesInterceptor('imageFile', 10))
+  uploadMultipleFiles(@UploadedFiles() files: Array<Express.Multer.File>) {
+    console.log(files);
+    return { message: "Files uploaded successfully", files };
   }
 
 

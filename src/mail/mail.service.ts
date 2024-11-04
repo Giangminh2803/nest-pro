@@ -1,6 +1,9 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { Cron } from '@nestjs/schedule';
+import mongoose from 'mongoose';
+import { use } from 'passport';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { USER_ROLE } from 'src/databases/sample';
 import { Invoice, InvoiceDocument } from 'src/invoices/schemas/invoice.schema';
@@ -11,6 +14,7 @@ import { Role, RoleDocument } from 'src/role/schemas/role.schema';
 import { Service, ServiceDocument } from 'src/services/schemas/service.schema';
 import { User, UserDocument } from 'src/users/schemas/user.schema';
 
+const {ObjectId} = mongoose.Types;
 @Injectable()
 export class MailService {
   constructor(
@@ -31,12 +35,16 @@ export class MailService {
     private payModel: SoftDeleteModel<PayDocument>
   ) { }
 
-  async handleTestEmail() {
+  @Cron("0 8 * * *")
+  async autoSendMailInvoice() {
     const userRole = await this.roleModel.findOne({ name: USER_ROLE });
     const users = await this.userModel.find({ role: userRole?._id }).select('-password');
-
     for (const user of users) {
-      const invoiceWithUserId = await this.invoiceModel.find({ "tenant._id": user._id, send: false });
+      
+      const invoiceWithUserId = await this.invoiceModel.find({ $or: [
+        { "tenant._id": user._id.toString() },
+        { "tenant._id": new ObjectId(user._id) }
+      ], send: false });
       if (invoiceWithUserId?.length > 0) {
         let totalMoney: number = 0;
         let invoices = invoiceWithUserId.map(item => {
