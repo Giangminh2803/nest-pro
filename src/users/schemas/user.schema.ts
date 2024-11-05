@@ -28,7 +28,7 @@ export class User {
   codeId: string;
 
   @Prop()
-  images: { imagePath: string }[];
+  images: string[];
 
   @Prop()
   codeExpire: Date;

@@ -23,6 +23,9 @@ export class CreateRoomDto {
     @IsString({ each: true })
     services: string[];
 
+    @IsString()
+    @IsOptional()
+    description: string;
 
     
 }

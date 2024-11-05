@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsDate, IsDateString, IsEmail, IsInt, IsNotEmpty, IsNotEmptyObject, IsNumber, IsNumberString, IsObject, IsOptional, IsString, Length, Max, MaxLength, Min, MinLength, ValidateNested } from "class-validator"
+import { IsArray, isArray, IsDate, IsDateString, IsEmail, IsInt, IsNotEmpty, IsNotEmptyObject, IsNumber, IsNumberString, IsObject, IsOptional, IsString, Length, Max, MaxLength, Min, MinLength, ValidateNested } from "class-validator"
 import mongoose from "mongoose";
 
 export class CreateUserDto {
@@ -13,6 +13,7 @@ export class CreateUserDto {
     password: string
 
     @IsString()
+    @IsOptional()
     name: string
 
     @IsDateString()
@@ -31,23 +32,29 @@ export class CreateUserDto {
     @MinLength(10)
     phone: string
 
+    
+    @IsArray()
+    images: string[]
+
     @IsString()
+    @IsOptional()
     gender: string
 
     @IsString()
+    @IsOptional()
     address: string
 
     @IsString()
     @IsOptional()
     role: mongoose.Schema.Types.ObjectId
 
-    
+
 }
 
 export class RegisterUserDto {
-    
+
     @IsString()
-    @IsNotEmpty({message: 'Email is invalid'})
+    @IsNotEmpty({ message: 'Email is invalid' })
     @IsEmail()
     email: string
 
@@ -57,16 +64,23 @@ export class RegisterUserDto {
     password: string
 
     @IsString()
+    @IsOptional()
     name: string
 
-    
+
     @IsDateString()
     birthday: Date
 
     @IsString()
+    @IsOptional()
     gender: string
 
     @IsString()
+    @IsArray()
+    images: string[]
+
+    @IsString()
+    @IsOptional()
     address: string
 
     @IsNumberString()
@@ -84,7 +98,7 @@ export class RegisterUserDto {
 }
 
 export class CodeAuthDto {
-    
+
     @IsString()
     _id: string
 
@@ -94,7 +108,7 @@ export class CodeAuthDto {
 }
 
 export class CodeResetPasswordDto {
-    
+
     @IsString()
     _id: string
 
