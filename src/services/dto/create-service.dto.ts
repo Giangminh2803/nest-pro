@@ -1,6 +1,5 @@
-import { Type } from "class-transformer";
-import { IsArray, IsDefined, IsEmail, IsInt, IsNotEmpty, IsNotEmptyObject, IsNumber, IsNumberString, IsObject, IsString, ValidateNested } from "class-validator"
 
+import { IsNumber, IsString} from "class-validator"
 
 export class CreateServiceDto {
     @IsString()
@@ -9,7 +8,7 @@ export class CreateServiceDto {
     @IsString()
     description: string;
 
-    @IsNumberString()
+    @IsNumber()
     price: number;
 
     @IsString()

@@ -5,11 +5,13 @@ import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { TransformInterceptor } from './core/transform.interceptor';
 import cookieParser from 'cookie-parser';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import helmet from 'helmet';
+import { join } from 'path';
 async function bootstrap() {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
 
-  const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
   const reflector = app.get(Reflector);
   app.useGlobalGuards(new JwtAuthGuard(reflector));
@@ -17,7 +19,8 @@ async function bootstrap() {
     whitelist: true
   }));
   app.useGlobalInterceptors(new TransformInterceptor(reflector));
-
+  app.useStaticAssets(join(__dirname, '..', 'public'));
+  app.setBaseViewsDir(join(__dirname, '..', 'view'));
   app.setGlobalPrefix('api')
   app.enableVersioning({
     type: VersioningType.URI,
@@ -26,10 +29,11 @@ async function bootstrap() {
   });
 
   app.use(cookieParser());
+  
   app.enableCors({
     "origin": true,
     "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
-    "preflightContinue": false,
+    //"preflightContinue": false,
     credentials: true
   });
   //CONFIG HELMET
