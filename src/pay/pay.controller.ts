@@ -3,7 +3,7 @@ import { PayService } from './pay.service';
 import { CreatePayDto } from './dto/create-pay.dto';
 import { UpdatePayDto } from './dto/update-pay.dto';
 
-import { Public, ResponseMessage, User } from 'src/decorator/customize';
+import { ResponseMessage, User } from 'src/decorator/customize';
 import { IUser } from 'src/users/user.interface';
 
 @Controller('pay')

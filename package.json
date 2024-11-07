@@ -41,6 +41,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "cookie-parser": "^1.4.6",
+    "crypto-js": "^4.2.0",
     "dayjs": "^1.11.13",
     "handlebars": "^4.7.8",
     "helmet": "^8.0.0",
@@ -54,6 +55,7 @@
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "sharp": "^0.33.5",
+    "simple-encryptor": "^4.0.0",
     "soft-delete-plugin-mongoose": "^1.0.15",
     "uuid": "^10.0.0"
   },

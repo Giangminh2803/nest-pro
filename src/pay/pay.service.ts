@@ -6,11 +6,31 @@ import { Pay, PayDocument } from './schemas/pay.schema';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from 'src/users/user.interface';
 import mongoose from 'mongoose';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class PayService {
   constructor(@InjectModel(Pay.name) private payModel: SoftDeleteModel<PayDocument>,
+    private configService: ConfigService
   ) { }
+
+  encryptor = require('simple-encryptor')(this.configService.get<string>('KEY_CODE'));
+
+  encode(data: string) {
+    const encrypted = this.encryptor.encrypt(data);
+    return encrypted;
+  }
+
+
+
+  decode(encrypted: string) {
+    const decrypted = this.encryptor.decrypt(encrypted);
+    return decrypted;
+  }
+
+
+
+
 
 
   async create(createPayDto: CreatePayDto, user: IUser) {
@@ -22,6 +42,9 @@ export class PayService {
     if (isExist) {
       throw new BadRequestException('Payment settings already exist!');
     }
+    createPayDto.apiKey = this.encode(createPayDto.apiKey);
+    createPayDto.clientId = this.encode(createPayDto.clientId);
+    createPayDto.checksumKey = this.encode(createPayDto.checksumKey);
     const configPay = await this.payModel.create(
       {
         ...createPayDto,
@@ -39,6 +62,7 @@ export class PayService {
     }
   }
 
+
   findAll() {
     return `This action returns all pay`;
   }
@@ -47,8 +71,13 @@ export class PayService {
     if (!mongoose.isValidObjectId(id)) {
       throw new BadRequestException('Id is not valid!')
     }
+    let config = await this.payModel.findOne({ _id: id });
+    config.apiKey = this.decode(config.apiKey);
+    config.clientId = this.decode(config.clientId);
+    config.checksumKey = this.decode(config.checksumKey);
 
-    return await this.payModel.findOne({ _id: id });
+
+    return config;
   }
 
   async update(id: string, updatePayDto: UpdatePayDto, user: IUser) {
@@ -70,7 +99,7 @@ export class PayService {
     if (!mongoose.isValidObjectId(id)) {
       throw new BadRequestException('Id is not valid!')
     }
-    await this.payModel.updateOne({_id: id}, {deletedBy: {_id: user._id, name: user.name, email: user.email}})
-    return await this.payModel.softDelete({_id: id});
+    await this.payModel.updateOne({ _id: id }, { deletedBy: { _id: user._id, name: user.name, email: user.email } })
+    return await this.payModel.softDelete({ _id: id });
   }
 }
