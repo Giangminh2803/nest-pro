@@ -744,4 +744,148 @@ export const INIT_PERMISSION = [
 		"updatedBy": {}
 
 	}, //Fetch Permission with id
+	{
+		"name": "Create Pay",
+		"apiPath": "/api/v1/pay",
+		"method": "POST",
+		"module": "Pay",
+		"createdBy": {
+			"_id": "",
+			"email": "admin@gmail.com"
+		},
+		"isDeleted": false,
+		"deletedAt": null,
+		"createdAt": "2024-08-17T04:41:40.369Z",
+		"updatedAt": "",
+		"__v": 0,
+		"updatedBy": {}
+
+	},//Create Pay	
+	{
+		"name": "Update Pay",
+		"apiPath": "/api/v1/pay/:id",
+		"method": "PATCH",
+		"module": "Pay",
+		"createdBy": {
+			"_id": "",
+			"email": "admin@gmail.com"
+		},
+		"isDeleted": false,
+		"deletedAt": null,
+		"createdAt": "2024-08-17T04:41:40.369Z",
+		"updatedAt": "",
+		"__v": 0,
+		"updatedBy": {}
+
+	}, //Update Pay
+
+	{
+
+		"name": "Soft Delete Pay",
+		"apiPath": "/api/v1/pay/:id",
+		"method": "DELETE",
+		"module": "Pay",
+		"createdBy": {
+			"_id": "",
+			"email": "admin@gmail.com"
+		},
+		"isDeleted": false,
+		"deletedAt": null,
+		"createdAt": "2024-08-17T04:41:40.369Z",
+		"updatedAt": "",
+		"__v": 0,
+		"updatedBy": {}
+	}, //Soft-delete Pay
+
+	{
+		"name": "Fetch Permissions with paginate",
+		"apiPath": "/api/v1/pay",
+		"method": "GET",
+		"module": "Pay",
+		"createdBy": {
+			"_id": "",
+			"email": "admin@gmail.com"
+		},
+		"isDeleted": false,
+		"deletedAt": null,
+		"createdAt": "2024-08-17T04:41:40.369Z",
+		"updatedAt": "",
+		"__v": 0,
+		"updatedBy": {}
+
+	}, //Fetch Pay with paginate 
+
+	{
+
+		"name": "Fetch a Pay with id",
+		"apiPath": "/api/v1/pay/:id",
+		"method": "GET",
+		"module": "Pay",
+		"createdBy": {
+			"_id": "",
+			"email": "admin@gmail.com"
+		},
+		"isDeleted": false,
+		"deletedAt": null,
+		"createdAt": "2024-08-17T04:41:40.369Z",
+		"updatedAt": "",
+		"__v": 0,
+		"updatedBy": {}
+
+	}, //Fetch Pay with id
+	{
+
+		"name": "Upload a single Files",
+		"apiPath": "/api/v1/files/upload",
+		"method": "POST",
+		"module": "Files",
+		"createdBy": {
+			"_id": "",
+			"email": "admin@gmail.com"
+		},
+		"isDeleted": false,
+		"deletedAt": null,
+		"createdAt": "2024-08-17T04:41:40.369Z",
+		"updatedAt": "",
+		"__v": 0,
+		"updatedBy": {}
+
+	},
+	{
+
+		"name": "Upload a multiple Files",
+		"apiPath": "/api/v1/files/multiple",
+		"method": "POST",
+		"module": "Files",
+		"createdBy": {
+			"_id": "",
+			"email": "admin@gmail.com"
+		},
+		"isDeleted": false,
+		"deletedAt": null,
+		"createdAt": "2024-08-17T04:41:40.369Z",
+		"updatedAt": "",
+		"__v": 0,
+		"updatedBy": {}
+
+	},
+
+	{
+
+		"name": "Upload a multiple Files",
+		"apiPath": "/api/v1/files/uploadBase64",
+		"method": "POST",
+		"module": "Files",
+		"createdBy": {
+			"_id": "",
+			"email": "admin@gmail.com"
+		},
+		"isDeleted": false,
+		"deletedAt": null,
+		"createdAt": "2024-08-17T04:41:40.369Z",
+		"updatedAt": "",
+		"__v": 0,
+		"updatedBy": {}
+
+	},
 ]

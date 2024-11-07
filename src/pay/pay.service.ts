@@ -1,44 +1,76 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreatePayDto } from './dto/create-pay.dto';
 import { UpdatePayDto } from './dto/update-pay.dto';
-import PayOS from '@payos/node';
-import { IPayment } from './IPayment.interface';
-import dayjs from 'dayjs';
+import { InjectModel } from '@nestjs/mongoose';
+import { Pay, PayDocument } from './schemas/pay.schema';
+import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
+import { IUser } from 'src/users/user.interface';
+import mongoose from 'mongoose';
 
 @Injectable()
 export class PayService {
-  async handlePayment(payment: IPayment) {
-    const payos = new PayOS(
-      '0a1cb2f2-420b-4ee3-b0e4-3ffecacdaf79',
-      '2cbd5f45-b74e-428f-a37e-acfc271ea01d',
-      'a4565674b9aa4c62e629a6ff5b9729019392f4620fab15f99125bddd4f83210a')
-    const dates = new Date().getTime();
-    const order = {
-      amount: payment.amount,
-      description: payment.description,
-      orderCode: dates,
-      expireAt: dayjs().add(10, 'days'),
-      returnUrl: 'http://localhost:8000',
-      cancelUrl: "http://localhost:8000"
-    };
-    
-     const paymentLink = await payos.createPaymentLink(order);
-    return paymentLink;
+  constructor(@InjectModel(Pay.name) private payModel: SoftDeleteModel<PayDocument>,
+  ) { }
+
+
+  async create(createPayDto: CreatePayDto, user: IUser) {
+    const isExist = await this.payModel.findOne({
+      clientId: createPayDto.clientId,
+      apiKey: createPayDto.apiKey,
+      checksumKey: createPayDto.checksumKey
+    })
+    if (isExist) {
+      throw new BadRequestException('Payment settings already exist!');
+    }
+    const configPay = await this.payModel.create(
+      {
+        ...createPayDto,
+        userId: user._id,
+        createdBy: {
+          _id: user._id,
+          name: user.name,
+          email: user.email
+        }
+      })
+
+    return {
+      _id: configPay._id,
+      createdAt: configPay.createdAt
+    }
   }
 
   findAll() {
     return `This action returns all pay`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} pay`;
+  async findOne(id: string) {
+    if (!mongoose.isValidObjectId(id)) {
+      throw new BadRequestException('Id is not valid!')
+    }
+
+    return await this.payModel.findOne({ _id: id });
   }
 
-  update(id: number, updatePayDto: UpdatePayDto) {
-    return `This action updates a #${id} pay`;
+  async update(id: string, updatePayDto: UpdatePayDto, user: IUser) {
+    if (!mongoose.isValidObjectId(id)) {
+      throw new BadRequestException('Id is not valid!')
+    }
+    return await this.payModel.updateOne({ _id: id }, {
+      ...updatePayDto,
+      updatedBy: {
+        _id: user._id,
+        name: user.name,
+        email: user.email
+
+      }
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} pay`;
+  async remove(id: string, user: IUser) {
+    if (!mongoose.isValidObjectId(id)) {
+      throw new BadRequestException('Id is not valid!')
+    }
+    await this.payModel.updateOne({_id: id}, {deletedBy: {_id: user._id, name: user.name, email: user.email}})
+    return await this.payModel.softDelete({_id: id});
   }
 }

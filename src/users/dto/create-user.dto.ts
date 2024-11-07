@@ -32,9 +32,13 @@ export class CreateUserDto {
     @MinLength(10)
     phone: string
 
-    
+    @IsOptional()
     @IsArray()
-    images: string[]
+    imagesIdCard: string[]
+
+    @IsOptional()
+    @IsString()
+    avatar: string;
 
     @IsString()
     @IsOptional()
@@ -78,6 +82,10 @@ export class RegisterUserDto {
     @IsString()
     @IsArray()
     images: string[]
+
+    @IsOptional()
+    @IsString()
+    avatar: string;
 
     @IsString()
     @IsOptional()

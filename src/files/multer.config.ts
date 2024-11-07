@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { MulterModuleOptions, MulterOptionsFactory } from "@nestjs/platform-express";
 import * as fs from "fs";
-import { diskStorage } from "multer";
+import multer, { diskStorage } from "multer";
 import * as path from "path";
 import { join } from "path";
 
@@ -50,4 +50,12 @@ export class MulterConfigService implements MulterOptionsFactory {
             }
         };
     }
+    static memoryStorageConfig() {
+        return {
+          storage: multer.memoryStorage(),
+          limits: { fileSize: 3 * 1024 * 1024 }, // Giới hạn kích thước file 8MB
+        };
+      
 }
+}
+

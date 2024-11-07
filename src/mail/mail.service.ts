@@ -7,7 +7,7 @@ import { use } from 'passport';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { USER_ROLE } from 'src/databases/sample';
 import { Invoice, InvoiceDocument } from 'src/invoices/schemas/invoice.schema';
-import { IPayment } from 'src/pay/IPayment.interface';
+
 import { PayService } from 'src/pay/pay.service';
 import { Pay, PayDocument } from 'src/pay/schemas/pay.schema';
 import { Role, RoleDocument } from 'src/role/schemas/role.schema';
@@ -65,11 +65,7 @@ export class MailService {
           }
         })
         if (invoices && invoices.length > 0) {
-          const payment: IPayment = {
-            amount: totalMoney,
-            description: 'Thanh toán hoá đơn'
-          };
-          const paymentLink = await this.payService.handlePayment(payment);
+          
 
           for (const invoice of invoices) {
             await this.invoiceModel.updateOne({ _id: invoice.id }, { send: true });
@@ -82,7 +78,7 @@ export class MailService {
             context: {
               receiver: user.name,
               bills: invoices,
-              paymentLink: paymentLink.checkoutUrl,
+              paymentLink: "paymentLink.checkoutUrl",
               total: totalMoney.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + " đ"
             }
 

@@ -7,7 +7,7 @@ import { User, UserSchema } from 'src/users/schemas/user.schema';
 import { Permission, PermissionSchema } from 'src/permission/schemas/permission.schema';
 import { Role, RoleSchema } from 'src/role/schemas/role.schema';
 
-@Module({
+@Module({ 
   controllers: [DatabasesController],
   providers: [DatabasesService, UsersService],
   imports: [

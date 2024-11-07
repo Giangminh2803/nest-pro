@@ -28,7 +28,10 @@ export class User {
   codeId: string;
 
   @Prop()
-  images: string[];
+  imagesIdCard: string[];
+
+  @Prop()
+  avatar: string;
 
   @Prop()
   codeExpire: Date;
