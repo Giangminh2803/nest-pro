@@ -53,9 +53,18 @@ export class MulterConfigService implements MulterOptionsFactory {
     static memoryStorageConfig() {
         return {
           storage: multer.memoryStorage(),
-          limits: { fileSize: 3 * 1024 * 1024 }, // Giới hạn kích thước file 8MB
-        };
+          limits: { fileSize: 3 * 1024 * 1024 },
+          fileFilter: (req, file, callback) => {
+            // Chỉ cho phép upload file hình ảnh
+            const allowedMimes = ['image/jpeg', 'image/png', 'image/gif'];
+            if (!allowedMimes.includes(file.mimetype)) {
+              return callback(new Error('Only image files are allowed'), false);
+            }
+            callback(null, true);
+        },
+    };
       
 }
 }
+
 

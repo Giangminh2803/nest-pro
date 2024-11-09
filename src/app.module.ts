@@ -8,7 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { softDeletePlugin } from 'soft-delete-plugin-mongoose';
 import { FilesModule } from './files/files.module';
 import { ServicesModule } from './services/services.module';
-import { EquipmentsModule } from './equipments/equipments.module';
+
 import { RoomsModule } from './rooms/rooms.module';
 import { InvoicesModule } from './invoices/invoices.module';
 import { ContractsModule } from './contracts/contracts.module';
@@ -20,6 +20,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
 import { APP_GUARD } from '@nestjs/core';
 import { PayModule } from './pay/pay.module';
+
 
 
 
@@ -49,7 +50,7 @@ import { PayModule } from './pay/pay.module';
     AuthModule,
     FilesModule,
     ServicesModule,
-    EquipmentsModule,
+  
     RoomsModule,
     InvoicesModule,
     ContractsModule,
@@ -58,7 +59,8 @@ import { PayModule } from './pay/pay.module';
     DatabasesModule,
     MailModule,
     PayModule,
-    ConfigModule
+    ConfigModule,
+   
   ],
   controllers: [AppController],
 

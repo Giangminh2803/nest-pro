@@ -1,24 +1,7 @@
 export const ADMIN_ROLE = "SUPER ADMIN";
 export const USER_ROLE = "NORMAL USER";
 export const INIT_PERMISSION = [
-	{
 
-		"name": "Register a User",
-		"apiPath": "/api/v1/users/register",
-		"method": "POST",
-		"module": "User",
-		"createdBy": {
-			"_id": "",
-			"email": "admin@gmail.com"
-		},
-		"isDeleted": false,
-		"deletedAt": null,
-		"createdAt": "2024-08-17T04:41:40.369Z",
-		"updatedAt": "",
-		"__v": 0,
-		"updatedBy": {}
-
-	}, //Register a User
 	{
 
 		"name": "Create a User",
@@ -181,27 +164,10 @@ export const INIT_PERMISSION = [
 		"updatedBy": {}
 
 	}, //Fetch data Room by Id
+
 	{
 
-		"name": "Fetch data Room by tenantId (userId)",
-		"apiPath": "/api/v1/rooms/by-tenant/:id",
-		"method": "GET",
-		"module": "Room",
-		"createdBy": {
-			"_id": "",
-			"email": "admin@gmail.com"
-		},
-		"isDeleted": false,
-		"deletedAt": null,
-		"createdAt": "2024-08-17T04:41:40.369Z",
-		"updatedAt": "",
-		"__v": 0,
-		"updatedBy": {}
-
-	}, //Fetch data Room by tenantId (userId)
-	{
-
-		"name": "New Request",
+		"name": "Fetch data Room with paginate",
 		"apiPath": "/api/v1/rooms",
 		"method": "GET",
 		"module": "Room",
@@ -216,7 +182,7 @@ export const INIT_PERMISSION = [
 		"__v": 0,
 		"updatedBy": {}
 
-	}, //New Request
+	}, //Fetch data Room with paginate
 
 	{
 
@@ -311,10 +277,10 @@ export const INIT_PERMISSION = [
 
 	{
 
-		"name": "Create a Equipment!",
-		"apiPath": "/api/v1/equipments",
+		"name": "Create a Invoices",
+		"apiPath": "/api/v1/invoices",
 		"method": "POST",
-		"module": "Equipment",
+		"module": "Invoices",
 		"createdBy": {
 			"_id": "",
 			"email": "admin@gmail.com"
@@ -326,13 +292,13 @@ export const INIT_PERMISSION = [
 		"__v": 0,
 		"updatedBy": {}
 
-	}, //Create a Equipment!
+	}, //Create a Invoices
 	{
 
-		"name": "Update a Equipment",
-		"apiPath": "/api/v1/equipments/:id",
-		"method": "PATCH",
-		"module": "Equipment",
+		"name": "Fetch data invoices with paginate",
+		"apiPath": "/api/v1/invoices",
+		"method": "GET",
+		"module": "Invoices",
 		"createdBy": {
 			"_id": "",
 			"email": "admin@gmail.com"
@@ -344,13 +310,31 @@ export const INIT_PERMISSION = [
 		"__v": 0,
 		"updatedBy": {}
 
-	}, //Update a Equipment
+	}, //Fetch data invoices with paginate
 	{
 
-		"name": "Soft-delete a Equiment",
-		"apiPath": "/api/v1/equipments/:id",
+		"name": "Get Invoices by user Id",
+		"apiPath": "/api/v1/invoices/by-user",
+		"method": "GET",
+		"module": "Invoices",
+		"createdBy": {
+			"_id": "",
+			"email": "admin@gmail.com"
+		},
+		"isDeleted": false,
+		"deletedAt": null,
+		"createdAt": "2024-08-17T04:41:40.369Z",
+		"updatedAt": "",
+		"__v": 0,
+		"updatedBy": {}
+
+	}, //Get Invoices by user Id
+	{
+
+		"name": "Soft-delete Invoices",
+		"apiPath": "/api/v1/invoices/:id",
 		"method": "DELETE",
-		"module": "Equipment",
+		"module": "Invoices",
 		"createdBy": {
 			"_id": "",
 			"email": "admin@gmail.com"
@@ -362,104 +346,13 @@ export const INIT_PERMISSION = [
 		"__v": 0,
 		"updatedBy": {}
 
-	}, //Soft-delete a Equiment
+	}, //Soft-delete Invoices
 	{
 
-		"name": "Fetch data Equipment with paginate",
-		"apiPath": "/api/v1/equipments",
-		"method": "GET",
-		"module": "Equipment",
-		"createdBy": {
-			"_id": "",
-			"email": "admin@gmail.com"
-		},
-		"isDeleted": false,
-		"deletedAt": null,
-		"createdAt": "2024-08-17T04:41:40.369Z",
-		"updatedAt": "",
-		"__v": 0,
-		"updatedBy": {}
-
-	}, //Soft-delete a Equiment
-
-	{
-
-		"name": "Create a Bill",
-		"apiPath": "/api/v1/bills",
-		"method": "POST",
-		"module": "Bill",
-		"createdBy": {
-			"_id": "",
-			"email": "admin@gmail.com"
-		},
-		"isDeleted": false,
-		"deletedAt": null,
-		"createdAt": "2024-08-17T04:41:40.369Z",
-		"updatedAt": "",
-		"__v": 0,
-		"updatedBy": {}
-
-	}, //Create a Bill
-	{
-
-		"name": "Fetch data bills with paginate",
-		"apiPath": "/api/v1/bills",
-		"method": "GET",
-		"module": "Bill",
-		"createdBy": {
-			"_id": "",
-			"email": "admin@gmail.com"
-		},
-		"isDeleted": false,
-		"deletedAt": null,
-		"createdAt": "2024-08-17T04:41:40.369Z",
-		"updatedAt": "",
-		"__v": 0,
-		"updatedBy": {}
-
-	}, //Fetch data bills with paginate
-	{
-
-		"name": "Get Bills by user Id",
-		"apiPath": "/api/v1/bills/by-user",
-		"method": "GET",
-		"module": "Bill",
-		"createdBy": {
-			"_id": "",
-			"email": "admin@gmail.com"
-		},
-		"isDeleted": false,
-		"deletedAt": null,
-		"createdAt": "2024-08-17T04:41:40.369Z",
-		"updatedAt": "",
-		"__v": 0,
-		"updatedBy": {}
-
-	}, //Get Bills by user Id
-	{
-
-		"name": "Soft-delete Bill",
-		"apiPath": "/api/v1/bills/:id",
-		"method": "DELETE",
-		"module": "Bill",
-		"createdBy": {
-			"_id": "",
-			"email": "admin@gmail.com"
-		},
-		"isDeleted": false,
-		"deletedAt": null,
-		"createdAt": "2024-08-17T04:41:40.369Z",
-		"updatedAt": "",
-		"__v": 0,
-		"updatedBy": {}
-
-	}, //Soft-delete Bill
-	{
-
-		"name": "Update a Bill",
-		"apiPath": "/api/v1/bills/:id",
+		"name": "Update a Invoices",
+		"apiPath": "/api/v1/invoices/:id",
 		"method": "PATCH",
-		"module": "Bill",
+		"module": "Invoices",
 		"createdBy": {
 			"_id": "",
 			"email": "admin@gmail.com"
@@ -471,7 +364,7 @@ export const INIT_PERMISSION = [
 		"__v": 0,
 		"updatedBy": {}
 
-	}, //Update a Bill
+	}, //Update a Invoices
 
 	{
 
@@ -871,9 +764,8 @@ export const INIT_PERMISSION = [
 	},
 
 	{
-
-		"name": "Upload a multiple Files",
-		"apiPath": "/api/v1/files/uploadBase64",
+		"name": "Upload a Image Id Card",
+		"apiPath": "/api/v1/files/onCloud",
 		"method": "POST",
 		"module": "Files",
 		"createdBy": {
