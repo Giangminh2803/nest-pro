@@ -762,10 +762,9 @@ export const INIT_PERMISSION = [
 		"updatedBy": {}
 
 	},
-
 	{
 		"name": "Upload a Image Id Card",
-		"apiPath": "/api/v1/files/onCloud",
+		"apiPath": "/api/v1/files",
 		"method": "POST",
 		"module": "Files",
 		"createdBy": {
