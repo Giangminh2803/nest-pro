@@ -32,7 +32,7 @@ export class ContractsController {
   }
 
  
-
+  @ResponseMessage('Update a Contract!')
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateContractDto: UpdateContractDto, @User() user: IUser) {
     return this.contractsService.update(id, updateContractDto, user);

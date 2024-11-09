@@ -131,7 +131,7 @@ export class InvoicesService {
         }
       }
     }
-    console.log('done create invoice!');
+    
 
   }
 
@@ -204,7 +204,7 @@ export class InvoicesService {
       }
     }
 
-    console.log("done");
+    
   }
 
 

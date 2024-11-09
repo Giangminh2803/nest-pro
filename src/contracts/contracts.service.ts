@@ -21,7 +21,7 @@ export class ContractsService {
   constructor(
     private mailerService: MailerService,
     @InjectModel(Contract.name) private contractModel: SoftDeleteModel<ContractDocument>,
-    @InjectModel(User.name) private userModel: SoftDeleteModel<UserDocument>,
+    
     @InjectModel(Room.name) private roomModel: SoftDeleteModel<RoomDocument>) { }
 
   async create(createContractDto: CreateContractDto, user: IUser) {
@@ -149,7 +149,7 @@ export class ContractsService {
 
     const isExist = await this.contractModel.findOne({ _id: id, isDeleted: false });
     if (isExist) {
-      return await this.contractModel.updateOne({ _id: id }, {
+        await this.contractModel.updateOne({ _id: id }, {
         ...updateContractDto,
         updatedBy: {
           _id: user._id,
@@ -159,6 +159,13 @@ export class ContractsService {
         },
 
       });
+      const contract = await this.contractModel.updateOne({ _id: id, status: "CANCELED" }, {actualEndDate: dayjs()})
+      if(contract){
+        const room = await this.roomModel.updateOne({
+        _id: new ObjectId(isExist.room._id.toString())
+        }, {status: "AVAILABLE"})
+        return contract;
+      }
     }
     throw new BadRequestException('Something wrong!!!');
   }
@@ -180,7 +187,7 @@ export class ContractsService {
   @Cron('0 6 * * * *')
   async autoUpdateStatus() {
     const today = dayjs().startOf('day');
-    await this.contractModel.updateMany({ endDate: { $lt: today }, status: "ACTIVE" }, { status: "EXPIRED" })
+    await this.contractModel.updateMany({ endDate: { $lt: today }, status: "ACTIVE" }, { status: "EXPIRED", actualEndDate: dayjs() })
   }
 
 

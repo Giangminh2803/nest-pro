@@ -69,6 +69,9 @@ export class Contract {
     createdAt: Date;
 
     @Prop()
+    actualEndDate: Date;
+
+    @Prop()
     updatedAt: Date;
 
     @Prop()

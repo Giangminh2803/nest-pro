@@ -65,7 +65,7 @@ export class CreateContractDto {
     @IsNumber()
     depositAmount: number
 
-
+    @IsOptional()
     @IsNumber()
     rentCycleCount: number
 
@@ -73,6 +73,7 @@ export class CreateContractDto {
     status: string;
 
     @IsString()
+    @IsOptional()
     address: string;
 
 }
