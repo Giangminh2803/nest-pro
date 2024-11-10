@@ -55,7 +55,26 @@ export const INIT_PERMISSION = [
 		"__v": 0,
 		"updatedBy": {}
 
-	}, //Update a User
+	},
+	 //Update a User
+	 {
+
+		"name": "Change password",
+		"apiPath": "/api/v1/users/change-password",
+		"method": "POST",
+		"module": "User",
+		"createdBy": {
+			"_id": "",
+			"email": "admin@gmail.com"
+		},
+		"isDeleted": false,
+		"deletedAt": null,
+		"createdAt": "2024-08-17T04:41:40.369Z",
+		"updatedAt": "",
+		"__v": 0,
+		"updatedBy": {}
+
+	},
 	{
 
 		"name": "Soft-delete User by id",
