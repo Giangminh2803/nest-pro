@@ -71,10 +71,8 @@ export class UsersService {
     const hashPassword = this.hashPassword(registerUserDto.password);
     let user = await this.userModel.create(
       {
-        name, email, password: hashPassword,
-        birthday,
-        gender,
-        address,
+        ...registerUserDto,
+        password: hashPassword,
         isActive: false,
         role: userRole?._id,
         codeId: codeId,

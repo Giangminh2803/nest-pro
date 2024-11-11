@@ -81,7 +81,8 @@ export class RegisterUserDto {
 
     @IsString()
     @IsArray()
-    images: string[]
+    @IsOptional()
+    imagesIdCard: string[]
 
     @IsOptional()
     @IsString()
