@@ -8,10 +8,13 @@ import { IUser } from 'src/users/user.interface';
 import mongoose from 'mongoose';
 import { ConfigService } from '@nestjs/config';
 
+import { InvoicesService } from 'src/invoices/invoices.service';
+
 @Injectable()
 export class PayService {
   constructor(@InjectModel(Pay.name) private payModel: SoftDeleteModel<PayDocument>,
-    private configService: ConfigService
+    private configService: ConfigService,
+    private invoiceService: InvoicesService
   ) { }
 
   encryptor = require('simple-encryptor')(this.configService.get<string>('KEY_CODE'));
@@ -27,10 +30,6 @@ export class PayService {
     const decrypted = this.encryptor.decrypt(encrypted);
     return decrypted;
   }
-
-
-
-
 
 
   async create(createPayDto: CreatePayDto, user: IUser) {
@@ -63,8 +62,8 @@ export class PayService {
   }
 
 
-  findAll() {
-    return `This action returns all pay`;
+  async findAll() {
+    return await this.payModel.find().select({nameConfig: 1});
   }
 
   async findOne(id: string) {
@@ -93,6 +92,18 @@ export class PayService {
 
       }
     });
+  }
+
+  async createLinkPayment(idInvoice: string[], idPort: string){
+    if(!idInvoice || !mongoose.isValidObjectId(idPort)){
+      throw new BadRequestException('Strong thing wrong in client!');
+    }
+    const payPort = await this.findOne(idPort);
+    if(payPort){
+      
+
+    }
+    
   }
 
   async remove(id: string, user: IUser) {

@@ -19,6 +19,8 @@ export class PayController {
     return this.payService.create(createPayDto, user);
   }
 
+
+
   @ResponseMessage('Fetch data a config Pay!')
   @Get(':id')
   fetchData(
@@ -26,6 +28,12 @@ export class PayController {
 
   ) {
     return this.payService.findOne(id);
+  }
+
+  @ResponseMessage('Fetch data Pay!')
+  @Get()
+  fetchDataPayPort() {
+    return this.payService.findAll();
   }
 
   @ResponseMessage('Update a new config Pay!')
@@ -46,5 +54,14 @@ export class PayController {
     
   ) {
     return this.payService.remove(id, user);
+  }
+
+  @ResponseMessage('Fetch data Pay!')
+  @Post()
+  createLinkPayment(
+    @Body('idInvoices') idInvoice: string[],
+    @Body('idPort') idPort: string
+  ) {
+    return this.payService.createLinkPayment(idInvoice, idPort);
   }
 }

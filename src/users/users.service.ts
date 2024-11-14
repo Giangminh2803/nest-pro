@@ -67,7 +67,7 @@ export class UsersService {
   async register(registerUserDto: RegisterUserDto) {
     const userRole = await this.roleModel.findOne({ name: USER_ROLE });
     const codeId = uuidv4();
-    let { name, email, birthday, gender, address } = registerUserDto;
+  
     const hashPassword = this.hashPassword(registerUserDto.password);
     let user = await this.userModel.create(
       {

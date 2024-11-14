@@ -43,7 +43,7 @@ export class AuthService {
     }
 
     async login(user: IUser, response: Response) {
-        const { _id, name, email, role, permissions } = user;
+        const { _id, name, email, role, permissions, avatar } = user;
 
         const payload = {
             sub: 'token login',
@@ -52,7 +52,9 @@ export class AuthService {
             name,
             email,
             role,
-            //permissions
+            avatar
+            //permissions,
+
         };
         const refresh_token = this.createRefreshToken(payload);
         await this.usersService.updateUserToken(refresh_token, _id);
@@ -72,6 +74,7 @@ export class AuthService {
                 name,
                 email,
                 role,
+                avatar,
                 permissions: temp?.permissions ?? []
             }
         };
@@ -121,7 +124,7 @@ export class AuthService {
             let user = await this.usersService.findUserByToken(refresh_token);
             if (user) {
 
-                const { _id, name, email, role } = user;
+                const { _id, name, email, role, avatar } = user;
 
                 const payload = {
                     sub: 'token login',
@@ -129,7 +132,8 @@ export class AuthService {
                     _id,
                     name,
                     email,
-                    role
+                    role,
+                    avatar
                 };
                 const refresh_token = this.createRefreshToken(payload);
                 response.clearCookie('refresh_token')
