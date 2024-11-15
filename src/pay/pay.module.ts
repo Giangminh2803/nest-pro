@@ -6,12 +6,14 @@ import { Pay, PaySchema } from './schemas/pay.schema';
 import { ConfigModule } from '@nestjs/config';
 
 import { InvoicesModule } from 'src/invoices/invoices.module';
+import PayOS from '@payos/node';
 
 @Module({
   imports: [MongooseModule.forFeature([{name: Pay.name, schema: PaySchema}]),
 
   ConfigModule,
-  InvoicesModule
+  InvoicesModule,
+  
 ],
   controllers: [PayController],
   providers: [PayService],

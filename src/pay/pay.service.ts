@@ -7,15 +7,21 @@ import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from 'src/users/user.interface';
 import mongoose from 'mongoose';
 import { ConfigService } from '@nestjs/config';
-
+import PayOS from '@payos/node';
 import { InvoicesService } from 'src/invoices/invoices.service';
+import dayjs from 'dayjs';
+
 
 @Injectable()
 export class PayService {
+
   constructor(@InjectModel(Pay.name) private payModel: SoftDeleteModel<PayDocument>,
     private configService: ConfigService,
-    private invoiceService: InvoicesService
-  ) { }
+    private invoicesService: InvoicesService,
+
+  ) {
+
+  }
 
   encryptor = require('simple-encryptor')(this.configService.get<string>('KEY_CODE'));
 
@@ -63,7 +69,7 @@ export class PayService {
 
 
   async findAll() {
-    return await this.payModel.find().select({nameConfig: 1});
+    return await this.payModel.find().select({ nameConfig: 1 });
   }
 
   async findOne(id: string) {
@@ -94,16 +100,42 @@ export class PayService {
     });
   }
 
-  async createLinkPayment(idInvoice: string[], idPort: string){
-    if(!idInvoice || !mongoose.isValidObjectId(idPort)){
+  async createLinkPayment(idInvoices: string[], idPort: string) {
+    let amount = 0;
+    const idPay = Number(dayjs().format('YYYYMMDDHHmmss'));
+    if (!idInvoices || !mongoose.isValidObjectId(idPort)) {
       throw new BadRequestException('Strong thing wrong in client!');
     }
     const payPort = await this.findOne(idPort);
-    if(payPort){
-      
+    if (payPort) {
+      for (const idInvoice of idInvoices) {
+        const invoice = await this.invoicesService.findOne(idInvoice);
+        if (invoice) {
+          amount += invoice.amount;
+        }
+      }
+      const payOS = new PayOS(
+        this.configService.get<string>('CLIENT_ID_PAYOS'),
+        this.configService.get<string>('API_KEY_PAYOS'),
+        this.configService.get<string>('CHECKSUM_KEY_PAYOS'),
+      );
+      const order = {
+        amount: amount,
+        description: "Thanh toan hoa don",
+        orderCode: idPay,
+        returnUrl: "http://localhost:5173/user",
+        cancelUrl: "http://localhost:5173/user",
+      }
+
+      const paymentLink = await payOS.createPaymentLink(order);
+      return {
+        link: paymentLink.checkoutUrl,
+        _id: idPay
+      };
+
 
     }
-    
+
   }
 
   async remove(id: string, user: IUser) {
@@ -113,4 +145,13 @@ export class PayService {
     await this.payModel.updateOne({ _id: id }, { deletedBy: { _id: user._id, name: user.name, email: user.email } })
     return await this.payModel.softDelete({ _id: id });
   }
-}
+
+  async checkStatusPayment(id: number) {
+    const payOS = new PayOS(
+      this.configService.get<string>('CLIENT_ID_PAYOS'),
+      this.configService.get<string>('API_KEY_PAYOS'),
+      this.configService.get<string>('CHECKSUM_KEY_PAYOS'),
+    );
+    return await payOS.getPaymentLinkInformation(id);
+  }
+} 

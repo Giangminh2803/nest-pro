@@ -28,7 +28,7 @@ export class InvoicesController {
   @ResponseMessage('Fetch data Invoice with userId!')
   @Get('/by-user')
   findOne(@User() user: IUser) {
-    return this.invoicesService.findOne(user._id);
+    return this.invoicesService.findOneByUserId(user._id);
   }
 
   @ResponseMessage('Update a Invoice!')

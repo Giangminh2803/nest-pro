@@ -3,8 +3,9 @@ import { PayService } from './pay.service';
 import { CreatePayDto } from './dto/create-pay.dto';
 import { UpdatePayDto } from './dto/update-pay.dto';
 
-import { ResponseMessage, User } from 'src/decorator/customize';
+import { Public, ResponseMessage, User } from 'src/decorator/customize';
 import { IUser } from 'src/users/user.interface';
+import { Response } from 'express';
 
 @Controller('pay')
 export class PayController {
@@ -56,12 +57,23 @@ export class PayController {
     return this.payService.remove(id, user);
   }
 
+  @Public()
   @ResponseMessage('Fetch data Pay!')
-  @Post()
-  createLinkPayment(
+  @Post('payment')
+  async createLinkPayment(
     @Body('idInvoices') idInvoice: string[],
-    @Body('idPort') idPort: string
-  ) {
-    return this.payService.createLinkPayment(idInvoice, idPort);
+    @Body('idPort') idPort: string,
+  ) {   
+   return await this.payService.createLinkPayment(idInvoice, idPort);
+  }
+
+  @Public()
+  @ResponseMessage('Check!')
+  @Post('paymentCheck')
+  async checkStatusInvoice(
+
+    @Body('id') id: string,
+  ) {   
+   return await this.payService.checkStatusPayment(+id);
   }
 }

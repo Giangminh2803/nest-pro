@@ -239,12 +239,20 @@ export class InvoicesService {
 
   }
 
-  async findOne(id: string) {
+  async findOneByUserId(id: string) {
     if (!mongoose.isValidObjectId(id)) {
       throw new BadRequestException('Id is not valid');
     }
 
     return await this.invoiceModel.find({ "tenant._id": id });
+  }
+
+  async findOne(id: string) {
+    if (!mongoose.isValidObjectId(id)) {
+      throw new BadRequestException('Id is not valid');
+    }
+
+    return await this.invoiceModel.findOne({ _id: id });
   }
 
   async update(id: string, updateInvoiceDto: UpdateInvoiceDto, user: IUser) {
