@@ -103,17 +103,17 @@ export class PayService {
   async createLinkPayment(idInvoices: string[], idPort: string) {
     let amount = 0;
     const idPay = Number(dayjs().format('YYYYMMDDHHmmss'));
-    if (!idInvoices || !mongoose.isValidObjectId(idPort)) {
-      throw new BadRequestException('Strong thing wrong in client!');
-    }
-    const payPort = await this.findOne(idPort);
-    if (payPort) {
+    // if (!idInvoices || !mongoose.isValidObjectId(idPort)) {
+    //   throw new BadRequestException('Strong thing wrong in client!');
+    // }
+    // const payPort = await this.findOne(idPort);
+    // if (payPort) {
       for (const idInvoice of idInvoices) {
         const invoice = await this.invoicesService.findOne(idInvoice);
         if (invoice) {
           amount += invoice.amount;
         }
-      }
+      // }
       const payOS = new PayOS(
         this.configService.get<string>('CLIENT_ID_PAYOS'),
         this.configService.get<string>('API_KEY_PAYOS'),
@@ -128,14 +128,8 @@ export class PayService {
       }
 
       const paymentLink = await payOS.createPaymentLink(order);
-      return {
-        link: paymentLink.checkoutUrl,
-        _id: idPay
-      };
-
-
+      return paymentLink;
     }
-
   }
 
   async remove(id: string, user: IUser) {
