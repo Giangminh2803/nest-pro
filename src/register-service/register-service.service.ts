@@ -10,6 +10,7 @@ import { Room, RoomDocument } from 'src/rooms/schemas/room.schema';
 import { Contract, ContractDocument } from 'src/contracts/schemas/contract.schema';
 import dayjs from 'dayjs';
 import { Cron } from '@nestjs/schedule';
+import aqp from 'api-query-params';
 
 @Injectable()
 export class RegisterServiceService {
@@ -79,8 +80,35 @@ export class RegisterServiceService {
     throw new BadRequestException('Something wrong!');
   }
 
-  findAll() {
-    return `This action returns all registerService`;
+  async findAll(currentPage: number, pageSize: number, qs: string) {
+    const { filter, sort, projection, population } = aqp(qs);
+    delete filter.currentPage;
+    delete filter.pageSize;
+    const defaultCurrentPage = currentPage ? currentPage : 1;
+    const defaultPageSize = pageSize ? pageSize : 5;
+    const totalDocument = (await this.registerServiceModel.find(filter)).length;
+    let totalPage = Math.ceil(totalDocument / defaultPageSize);
+    let skip = (defaultCurrentPage - 1) * pageSize;
+
+
+    const result = await this.registerServiceModel.find(filter)
+      .skip(skip)
+      .limit(defaultPageSize)
+      .sort(sort as any)
+      .select(projection)
+      .populate(population)
+      .exec()
+
+    return {
+      meta: {
+        currentPage: defaultCurrentPage,
+        pageSize: defaultPageSize,
+        totalPage: totalPage,
+        totalDocument: totalDocument
+      },
+      result
+    }
+
   }
 
   async findOne(id: string) {

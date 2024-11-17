@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { RegisterServiceService } from './register-service.service';
 import { CreateRegisterServiceDto } from './dto/create-register-service.dto';
 import { UpdateRegisterServiceDto } from './dto/update-register-service.dto';
@@ -17,9 +17,14 @@ export class RegisterServiceController {
     return this.registerServiceService.create(createRegisterServiceDto, user);
   }
 
+  @ResponseMessage('Fetch data Register Service with paginate!')
   @Get()
-  findAll() {
-    return this.registerServiceService.findAll();
+  findAll(
+    @Query('currentPage') currentPage: string,
+    @Query('pageSize') pageSize: string,
+    @Query() qs: string
+  ) {
+    return this.registerServiceService.findAll(+currentPage, +pageSize, qs);
   }
 
   @ResponseMessage('Fetch data a Register Service for Room!')
