@@ -286,7 +286,7 @@ export class InvoicesService {
   }
   async autoUpdateStatusInvoice (ids: string[]){
     for(const id of ids){
-      await this.invoiceModel.updateOne({_id: id}, {status: "PAIN"});
+      await this.invoiceModel.updateOne({_id: id}, {status: "PAID"});
     }
     return "Auto Updated!"
   }

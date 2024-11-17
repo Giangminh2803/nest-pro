@@ -73,6 +73,6 @@ export class PayController {
     @Body('idInvoices') idInvoices: string[],
     @Body('id') id: string,
   ) {   
-   return await this.payService.checkStatusPayment(+id,idInvoices);
+   return await this.payService.checkStatusPayment(+id, idInvoices);
   }
 }

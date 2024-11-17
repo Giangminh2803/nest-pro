@@ -144,11 +144,11 @@ export class PayService {
       this.configService.get<string>('CHECKSUM_KEY_PAYOS'),
     );
     const inforInvoice = await payOS.getPaymentLinkInformation(id);
-    if (inforInvoice.status === "PAIN") {
+    if (inforInvoice.status === "PAID") {
       const update = await this.invoicesService.autoUpdateStatusInvoice(idInvoices);
-      return update;
+     
     }
-    return;
+    return inforInvoice;
 
   }
 } 
