@@ -141,12 +141,12 @@ export class RegisterServiceService {
     const isExist = await this.registerServiceModel.findById({ _id: id });
     if (isExist) {
       if (isExist.status === "PENDING") {
-        if (updateRegisterServiceDto.status === "SUCCESS") {
+        if (updateRegisterServiceDto.status === "APPROVED") {
           if(!isExist.type && isExist.executeNow){
             throw new BadRequestException("Service cannot be canceled without invoice!");
           }
           if(isExist.executeNow){
-            const now = await this.roomModel.updateOne({ _id: isExist.room }, { $push: { services: isExist.service.toString() } });
+            const now = await this.roomModel.updateOne({ _id: isExist.room }, { status: "SUCCESS" , $push: { services: isExist.service.toString() } });
           }else{
             const {startDate} = await this.contractModel.findOne({"room._id": isExist.room.toString()});
             const date = Number(dayjs(startDate).format('DD'));
@@ -199,21 +199,17 @@ export class RegisterServiceService {
 
   @Cron("* * * * *")
   async autoUpdateServiceForRoom(){
-    let done;
     const today = dayjs().format('DD-MM-YYYY');
-    const requestsUser = await this.registerServiceModel.find({status: "SUCCESS"});
+    const requestsUser = await this.registerServiceModel.find({status: "APPROVED"});
     if(requestsUser && requestsUser.length > 0){
       for(const requestUser of requestsUser){
         if(requestUser.type && requestUser?.implementationDate === today){
-           done = await this.roomModel.updateOne({ _id: requestUser.room }, { $push: { services: requestUser.service.toString() } });
+          await this.roomModel.updateOne({ _id: requestUser.room }, { $push: { services: requestUser.service.toString() } });
         }else if(!requestUser.type && requestUser.implementationDate === today){
-           done = await this.roomModel.updateOne({ _id: requestUser.room }, { $pull: { services: requestUser.service.toString() } });
+          await this.roomModel.updateOne({ _id: requestUser.room }, { $pull: { services: requestUser.service.toString() } });
         }
-        await this.registerServiceModel.updateOne({_id: requestUser._id}, {status: "DONE"});
-       
+        await this.registerServiceModel.updateOne({_id: requestUser._id}, {status: "SUCCESS"});
       }
-      
     }
-    
   }
 }
