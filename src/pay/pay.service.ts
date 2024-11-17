@@ -103,35 +103,30 @@ export class PayService {
   async createLinkPayment(idInvoices: string[]) {
     let amount = 0;
     const idPay = Number(dayjs().format('YYYYMMDDHHmmss'));
-    // if (!idInvoices || !mongoose.isValidObjectId(idPort)) {
-    //   throw new BadRequestException('Strong thing wrong in client!');
-    // }
-    // const payPort = await this.findOne(idPort);
-    // if (payPort) {
-      for(const idInvoice of idInvoices) {
-        const invoice = await this.invoicesService.findOne(idInvoice);
-        if (invoice) {
-          amount += invoice.amount;
-        }
+    for (const idInvoice of idInvoices) {
+      const invoice = await this.invoicesService.findOne(idInvoice);
+      if (invoice) {
+        amount += invoice.amount;
       }
-      // }
-      const payOS = new PayOS(
-        this.configService.get<string>('CLIENT_ID_PAYOS'),
-        this.configService.get<string>('API_KEY_PAYOS'),
-        this.configService.get<string>('CHECKSUM_KEY_PAYOS'),
-      );
-      const order = {
-        amount: amount,
-        description: "Thanh toan hoa don",
-        orderCode: idPay,
-        returnUrl: "http://localhost:5173/user",
-        cancelUrl: "http://localhost:5173/user",
-      }
-
-      const paymentLink = await payOS.createPaymentLink(order);
-      return paymentLink;
     }
-  
+    // }
+    const payOS = new PayOS(
+      this.configService.get<string>('CLIENT_ID_PAYOS'),
+      this.configService.get<string>('API_KEY_PAYOS'),
+      this.configService.get<string>('CHECKSUM_KEY_PAYOS'),
+    );
+    const order = {
+      amount: amount,
+      description: idPay.toString(),
+      orderCode: idPay,
+      returnUrl: `${this.configService.get<string>('URL_FE')}/user/invoiceUser`,
+      cancelUrl: `${this.configService.get<string>('URL_FE')}/user/invoiceUser`,
+    }
+
+    const paymentLink = await payOS.createPaymentLink(order);
+    return paymentLink;
+  }
+
 
 
   async remove(id: string, user: IUser) {
@@ -149,11 +144,11 @@ export class PayService {
       this.configService.get<string>('CHECKSUM_KEY_PAYOS'),
     );
     const inforInvoice = await payOS.getPaymentLinkInformation(id);
-    if(inforInvoice.status === "PAIN"){
+    if (inforInvoice.status === "PAIN") {
       const update = await this.invoicesService.autoUpdateStatusInvoice(idInvoices);
       return update;
     }
     return;
-    
+
   }
 } 
