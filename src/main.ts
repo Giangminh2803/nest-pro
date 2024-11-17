@@ -33,7 +33,7 @@ async function bootstrap() {
   app.enableCors({
     "origin": true,
     "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
-    //"preflightContinue": false,
+    "preflightContinue": false,
     credentials: true
   });
   //CONFIG HELMET

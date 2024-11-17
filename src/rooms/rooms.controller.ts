@@ -45,4 +45,6 @@ export class RoomsController {
   remove(@Param('id') id: string, @User() user: IUser) {
     return this.roomsService.remove(id, user);
   }
+
+  
 }

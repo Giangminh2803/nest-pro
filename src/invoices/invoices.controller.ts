@@ -43,10 +43,10 @@ export class InvoicesController {
     return this.invoicesService.remove(id, user);
   }
 
-  @ResponseMessage('Test')
-  @Post('/test')
+  @ResponseMessage('Auto update status!')
+  @Post('/autoUpdate')
   @Public()
-  Test() {
-    return this.invoicesService.autoCreateInvoice();
+  autoUpdateStatus(@Body('idInvoices') idInvoice: string[]) {
+    return this.invoicesService.autoUpdateStatusInvoice(idInvoice);
   }
 }

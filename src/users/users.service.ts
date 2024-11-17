@@ -66,7 +66,8 @@ export class UsersService {
 
   async register(registerUserDto: RegisterUserDto) {
     const userRole = await this.roleModel.findOne({ name: USER_ROLE });
-    const codeId = uuidv4();
+    const code = uuidv4();
+    const codeId = code.slice(0, 8);
   
     const hashPassword = this.hashPassword(registerUserDto.password);
     let user = await this.userModel.create(
@@ -234,7 +235,8 @@ export class UsersService {
     if(!isExist){
       throw new BadRequestException('Invalid data!');
     }
-    const codeId = uuidv4();
+    const code = uuidv4();
+    const codeId = code.slice(0, 8);
     await this.userModel.updateOne({_id: isExist._id},
       {
         codeId: codeId,

@@ -115,4 +115,6 @@ export class RoomsService {
 
     return await this.roomModel.softDelete({ _id: id });
   }
+
+  
 }

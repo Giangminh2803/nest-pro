@@ -27,6 +27,9 @@ export class Room {
   @Prop({ type: mongoose.Schema.Types.Array, ref: Service.name })
   services : mongoose.Schema.Types.ObjectId[] ;
 
+  @Prop({ type: mongoose.Schema.Types.Array, ref: Service.name })
+  regisServices : mongoose.Schema.Types.ObjectId[] 
+
   @Prop()
   createdAt: Date;
 

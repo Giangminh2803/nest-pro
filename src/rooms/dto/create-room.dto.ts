@@ -1,5 +1,6 @@
 
 import { IsArray, IsNumber, IsOptional, IsString } from "class-validator"
+import mongoose from "mongoose";
 
 export class CreateRoomDto {
     @IsString()

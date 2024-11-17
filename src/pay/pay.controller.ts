@@ -5,7 +5,6 @@ import { UpdatePayDto } from './dto/update-pay.dto';
 
 import { Public, ResponseMessage, User } from 'src/decorator/customize';
 import { IUser } from 'src/users/user.interface';
-import { Response } from 'express';
 
 @Controller('pay')
 export class PayController {
@@ -62,18 +61,18 @@ export class PayController {
   @Post('payment')
   async createLinkPayment(
     @Body('idInvoices') idInvoice: string[],
-    @Body('idPort') idPort: string,
+   
   ) {   
-   return await this.payService.createLinkPayment(idInvoice, idPort);
+   return await this.payService.createLinkPayment(idInvoice);
   }
 
   @Public()
   @ResponseMessage('Check!')
   @Post('paymentCheck')
   async checkStatusInvoice(
-
+    @Body('idInvoices') idInvoices: string[],
     @Body('id') id: string,
   ) {   
-   return await this.payService.checkStatusPayment(+id);
+   return await this.payService.checkStatusPayment(+id,idInvoices);
   }
 }

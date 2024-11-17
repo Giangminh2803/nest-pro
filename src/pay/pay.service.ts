@@ -100,7 +100,7 @@ export class PayService {
     });
   }
 
-  async createLinkPayment(idInvoices: string[], idPort: string) {
+  async createLinkPayment(idInvoices: string[]) {
     let amount = 0;
     const idPay = Number(dayjs().format('YYYYMMDDHHmmss'));
     // if (!idInvoices || !mongoose.isValidObjectId(idPort)) {
@@ -108,11 +108,12 @@ export class PayService {
     // }
     // const payPort = await this.findOne(idPort);
     // if (payPort) {
-      for (const idInvoice of idInvoices) {
+      for(const idInvoice of idInvoices) {
         const invoice = await this.invoicesService.findOne(idInvoice);
         if (invoice) {
           amount += invoice.amount;
         }
+      }
       // }
       const payOS = new PayOS(
         this.configService.get<string>('CLIENT_ID_PAYOS'),
@@ -130,7 +131,8 @@ export class PayService {
       const paymentLink = await payOS.createPaymentLink(order);
       return paymentLink;
     }
-  }
+  
+
 
   async remove(id: string, user: IUser) {
     if (!mongoose.isValidObjectId(id)) {
@@ -140,12 +142,18 @@ export class PayService {
     return await this.payModel.softDelete({ _id: id });
   }
 
-  async checkStatusPayment(id: number) {
+  async checkStatusPayment(id: number, idInvoices: string[]) {
     const payOS = new PayOS(
       this.configService.get<string>('CLIENT_ID_PAYOS'),
       this.configService.get<string>('API_KEY_PAYOS'),
       this.configService.get<string>('CHECKSUM_KEY_PAYOS'),
     );
-    return await payOS.getPaymentLinkInformation(id);
+    const inforInvoice = await payOS.getPaymentLinkInformation(id);
+    if(inforInvoice.status === "PAIN"){
+      const update = await this.invoicesService.autoUpdateStatusInvoice(idInvoices);
+      return update;
+    }
+    return;
+    
   }
 } 

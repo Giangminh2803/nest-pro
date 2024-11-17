@@ -259,7 +259,6 @@ export class InvoicesService {
     if (!mongoose.isValidObjectId(id)) {
       throw new BadRequestException('Id is not valid');
     }
-
     await this.invoiceModel.updateOne({ _id: id }, {
       ...updateInvoiceDto,
       updatedBy: {
@@ -285,13 +284,19 @@ export class InvoicesService {
 
     return update;
   }
+  async autoUpdateStatusInvoice (ids: string[]){
+    for(const id of ids){
+      await this.invoiceModel.updateOne({_id: id}, {status: "PAIN"});
+    }
+    return "Auto Updated!"
+  }
 
   async remove(id: string, user: IUser) {
     await this.invoiceModel.updateOne({ _id: id }, {
       updatedBy: {
         _id: user._id,
         email: user.email,
-        name: user.name
+        name: user.name 
       }
     })
     return await this.invoiceModel.softDelete({ _id: id });

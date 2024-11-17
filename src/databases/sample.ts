@@ -798,4 +798,89 @@ export const INIT_PERMISSION = [
 		"updatedBy": {}
 
 	},
+	{
+		"name": "Register a Service for Room",
+		"apiPath": "/api/v1/register-service",
+		"method": "POST",
+		"module": "Register-Service",
+		"createdBy": {
+			"_id": "",
+			"email": "admin@gmail.com"
+		},
+		"isDeleted": false,
+		"deletedAt": null,
+		"createdAt": "2024-08-17T04:41:40.369Z",
+		"updatedAt": "",
+		"__v": 0,
+		"updatedBy": {}
+
+	}, //Create a register Service
+	{
+		"name": "Update status register service for Room",
+		"apiPath": "/api/v1/register-service/:id",
+		"method": "PATCH",
+		"module": "Register-Service",
+		"createdBy": {
+			"_id": "",
+			"email": "admin@gmail.com"
+		},
+		"isDeleted": false,
+		"deletedAt": null,
+		"createdAt": "2024-08-17T04:41:40.369Z",
+		"updatedAt": "",
+		"__v": 0,
+		"updatedBy": {}
+
+	},//Update status register service for Room
+	{
+		"name": "Fetch a Register Service",
+		"apiPath": "/api/v1/register-service/:id",
+		"method": "GET",
+		"module": "Register-Service",
+		"createdBy": {
+			"_id": "",
+			"email": "admin@gmail.com"
+		},
+		"isDeleted": false,
+		"deletedAt": null,
+		"createdAt": "2024-08-17T04:41:40.369Z",
+		"updatedAt": "",
+		"__v": 0,
+		"updatedBy": {}
+
+	},//Fetch a Register Service
+	{
+		"name": "Fetch register service with paginate!",
+		"apiPath": "/api/v1/register-service",
+		"method": "GET",
+		"module": "Register-Service",
+		"createdBy": {
+			"_id": "",
+			"email": "admin@gmail.com"
+		},
+		"isDeleted": false,
+		"deletedAt": null,
+		"createdAt": "2024-08-17T04:41:40.369Z",
+		"updatedAt": "",
+		"__v": 0,
+		"updatedBy": {}
+
+	},//Fetch register service with paginate!
+	{
+		"name": "Soft-delete register service!",
+		"apiPath": "/api/v1/register-service/:id",
+		"method": "DELETE",
+		"module": "Register-Service",
+		"createdBy": {
+			"_id": "",
+			"email": "admin@gmail.com"
+		},
+		"isDeleted": false,
+		"deletedAt": null,
+		"createdAt": "2024-08-17T04:41:40.369Z",
+		"updatedAt": "",
+		"__v": 0,
+		"updatedBy": {}
+
+	},//Soft-delete register service!
 ]
