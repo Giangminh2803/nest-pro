@@ -50,7 +50,9 @@ export class UsersService {
     createUserDto.password = hashPassword;
     let data = await this.userModel.create(
       {
-        ...createUserDto, createdBy: {
+        ...createUserDto,
+        isActive: false,
+        createdBy: {
           _id: user._id,
           email: user.email
         }
@@ -68,7 +70,7 @@ export class UsersService {
     const userRole = await this.roleModel.findOne({ name: USER_ROLE });
     const code = uuidv4();
     const codeId = code.slice(0, 8);
-  
+
     const hashPassword = this.hashPassword(registerUserDto.password);
     let user = await this.userModel.create(
       {
@@ -142,16 +144,16 @@ export class UsersService {
   }
 
   async changePassword(id: string, password: string, oldPassword: string) {
-    const user = await this.userModel.findOne({_id: id});
+    const user = await this.userModel.findOne({ _id: id });
     const isTrueOldPass = this.isValidPassword(oldPassword, user.password);
 
-    if(isTrueOldPass){
+    if (isTrueOldPass) {
       const hashPassword = this.hashPassword(password);
-      return await this.userModel.updateOne({_id: id}, {password: hashPassword});
+      return await this.userModel.updateOne({ _id: id }, { password: hashPassword });
     }
-    
+
     throw new BadRequestException("The old password is incorrect!")
-   
+
   }
 
   async update(id: string, updateUserDto: UpdateUserDto, user: IUser) {
@@ -215,13 +217,13 @@ export class UsersService {
       _id: data._id,
       codeId: data.codeId
     })
-    if(!user){
+    if (!user) {
       throw new BadRequestException('Invalid data!');
     }
     const isBeforeCheck = dayjs().isBefore(user.codeExpire);
-    if(isBeforeCheck){
-      return await this.userModel.updateOne({_id: data._id}, {isActive: true});
-    }else{
+    if (isBeforeCheck) {
+      return await this.userModel.updateOne({ _id: data._id }, { isActive: true });
+    } else {
       throw new BadRequestException('Invalid data!');
     }
   }
@@ -232,24 +234,24 @@ export class UsersService {
         email: email
       }
     )
-    if(!isExist){
+    if (!isExist) {
       throw new BadRequestException('Invalid data!');
     }
     const code = uuidv4();
     const codeId = code.slice(0, 8);
-    await this.userModel.updateOne({_id: isExist._id},
+    await this.userModel.updateOne({ _id: isExist._id },
       {
         codeId: codeId,
         codeExpire: dayjs().add(5, 'minutes')
       }
     )
-    
+
     this.mailerService.sendMail({
-      to: email, 
-      from: isExist.isActive ? '"Request to retrieve password" <abc@gmail.com>' :  '"Verify account" <abc@gmail.com>',
-      subject:isExist.isActive ? 'Create a new password ✔' :  'Verify account ✔',
-      template: isExist.isActive ? "resetPassword": "verifyCode",
-      context: { 
+      to: email,
+      from: isExist.isActive ? '"Request to retrieve password" <abc@gmail.com>' : '"Verify account" <abc@gmail.com>',
+      subject: isExist.isActive ? 'Create a new password ✔' : 'Verify account ✔',
+      template: isExist.isActive ? "resetPassword" : "verifyCode",
+      context: {
         receiver: isExist?.name ?? isExist.email,
         activeCode: codeId
       }
@@ -265,14 +267,14 @@ export class UsersService {
       codeId: data.codeId
     })
     const hashPassword = this.hashPassword(data.password);
-   
-    if(!user){
+
+    if (!user) {
       throw new BadRequestException('Invalid data!');
     }
     const isBeforeCheck = dayjs().isBefore(user.codeExpire);
-    if(isBeforeCheck){
-      return await this.userModel.updateOne({_id: data._id}, {password: hashPassword});
-    }else{
+    if (isBeforeCheck) {
+      return await this.userModel.updateOne({ _id: data._id }, { password: hashPassword });
+    } else {
       throw new BadRequestException('Invalid data!');
     }
   }
