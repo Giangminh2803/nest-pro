@@ -32,7 +32,7 @@ export class RegisterServiceService {
     }
     const isExist = await this.registerServiceModel.findOne({
       room: createRegisterServiceDto.room,
-      user: createRegisterServiceDto.user,
+      user:  user._id,
       service: createRegisterServiceDto.service,
       type: createRegisterServiceDto.type,
     })
@@ -50,6 +50,7 @@ export class RegisterServiceService {
     if (isExistInRoom && createRegisterServiceDto.type === false) {
       const cancelService = await this.registerServiceModel.create({
         ...createRegisterServiceDto,
+        user: user._id,
         status: "PENDING",
         createdBy: {
           _id: user._id,
@@ -65,6 +66,7 @@ export class RegisterServiceService {
     if (!isExistInRoom && createRegisterServiceDto.type) {
       const registerService = await this.registerServiceModel.create({
         ...createRegisterServiceDto,
+        user : user._id,
         status: "PENDING",
         createdBy: {
           _id: user._id,
@@ -197,7 +199,7 @@ export class RegisterServiceService {
     return await this.registerServiceModel.softDelete({ _id: id });
   }
 
-  @Cron("* * * * *")
+  @Cron("*/5 * * * *")
   async autoUpdateServiceForRoom(){
     const today = dayjs().format('DD-MM-YYYY');
     const requestsUser = await this.registerServiceModel.find({status: "APPROVED"});
