@@ -19,6 +19,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
 import { APP_GUARD } from '@nestjs/core';
 import { RegisterServiceModule } from './register-service/register-service.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 
 
@@ -57,6 +58,7 @@ import { RegisterServiceModule } from './register-service/register-service.modul
     DatabasesModule,
     MailModule,
     RegisterServiceModule,
+    NotificationsModule,
    
   ],
   controllers: [AppController],

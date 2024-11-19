@@ -32,7 +32,7 @@ export class RegisterServiceService {
     }
     const isExist = await this.registerServiceModel.findOne({
       room: createRegisterServiceDto.room,
-      user:  user._id,
+      user: user._id,
       service: createRegisterServiceDto.service,
       type: createRegisterServiceDto.type,
     })
@@ -66,7 +66,7 @@ export class RegisterServiceService {
     if (!isExistInRoom && createRegisterServiceDto.type) {
       const registerService = await this.registerServiceModel.create({
         ...createRegisterServiceDto,
-        user : user._id,
+        user: user._id,
         status: "PENDING",
         createdBy: {
           _id: user._id,
@@ -144,25 +144,25 @@ export class RegisterServiceService {
     if (isExist) {
       if (isExist.status === "PENDING") {
         if (updateRegisterServiceDto.status === "APPROVED") {
-          if(!isExist.type && isExist.executeNow){
+          if (!isExist.type && isExist.executeNow) {
             throw new BadRequestException("Service cannot be canceled without invoice!");
           }
-          if(isExist.executeNow){
-            const now = await this.roomModel.updateOne({ _id: isExist.room }, { status: "SUCCESS" , $push: { services: isExist.service.toString() } });
-          }else{
-            const {startDate} = await this.contractModel.findOne({"room._id": isExist.room.toString()});
+          if (isExist.executeNow) {
+            const now = await this.roomModel.updateOne({ _id: isExist.room }, { status: "SUCCESS", $push: { services: isExist.service.toString() } });
+          } else {
+            const { startDate } = await this.contractModel.findOne({ "room._id": isExist.room.toString() });
             const date = Number(dayjs(startDate).format('DD'));
             const targetDay = dayjs().date(date);
             let day;
             const today = dayjs();
-            if(today.isSame(targetDay, 'date')){
+            if (today.isSame(targetDay, 'date')) {
               day = targetDay.format('DD-MM-YYYY');
-            }else if(today.isAfter(targetDay)){
+            } else if (today.isAfter(targetDay)) {
               day = targetDay.add(1, "month").format('DD-MM-YYYY');
-            }else{
+            } else {
               day = targetDay.format('DD-MM-YYYY');
             }
-            const after = await this.registerServiceModel.updateOne({_id: isExist._id},{implementationDate: day});
+            const after = await this.registerServiceModel.updateOne({ _id: isExist._id }, { implementationDate: day });
           }
           return await this.registerServiceModel.updateOne(
             { _id: id },
@@ -174,8 +174,8 @@ export class RegisterServiceService {
                 name: user.name
               }
             })
-        } 
-      
+        }
+
       }
     }
     throw new BadRequestException('Something wrong!');
@@ -185,8 +185,8 @@ export class RegisterServiceService {
     if (!mongoose.isObjectIdOrHexString(id)) {
       throw new BadRequestException('Id is not valid!')
     }
-    const isExist = await this.registerServiceModel.findOne({_id: id, status: "PENDING"});
-    if(!isExist){
+    const isExist = await this.registerServiceModel.findOne({ _id: id, status: "PENDING" });
+    if (!isExist) {
       throw new BadRequestException('Something wrong!');
     }
     await this.registerServiceModel.updateOne({ _id: id }, {
@@ -200,17 +200,20 @@ export class RegisterServiceService {
   }
 
   @Cron("*/5 * * * *")
-  async autoUpdateServiceForRoom(){
+  async autoUpdateServiceForRoom() {
     const today = dayjs().format('DD-MM-YYYY');
-    const requestsUser = await this.registerServiceModel.find({status: "APPROVED"});
-    if(requestsUser && requestsUser.length > 0){
-      for(const requestUser of requestsUser){
-        if(requestUser.type && requestUser?.implementationDate === today){
+    const requestsUser = await this.registerServiceModel.find({ status: "APPROVED" });
+    if (requestsUser && requestsUser.length > 0) {
+      for (const requestUser of requestsUser) {
+        if (requestUser.type && requestUser?.implementationDate === today) {
           await this.roomModel.updateOne({ _id: requestUser.room }, { $push: { services: requestUser.service.toString() } });
-        }else if(!requestUser.type && requestUser.implementationDate === today){
+          await this.registerServiceModel.updateOne({ _id: requestUser._id }, { status: "SUCCESS" });
+
+        } else if (!requestUser.type && requestUser.implementationDate === today) {
           await this.roomModel.updateOne({ _id: requestUser.room }, { $pull: { services: requestUser.service.toString() } });
+          await this.registerServiceModel.updateOne({ _id: requestUser._id }, { status: "SUCCESS" });
+
         }
-        await this.registerServiceModel.updateOne({_id: requestUser._id}, {status: "SUCCESS"});
       }
     }
   }
