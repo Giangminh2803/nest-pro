@@ -141,80 +141,83 @@ export class RegisterServiceService {
       throw new BadRequestException('Id is not valid!')
     }
     const isExist = await this.registerServiceModel.findById({ _id: id });
-    if (isExist) {
-      if (isExist.status === "PENDING") {
-        if (updateRegisterServiceDto.status === "APPROVED") {
-          if (!isExist.type && isExist.executeNow) {
-            throw new BadRequestException("Service cannot be canceled without invoice!");
-          }
-          if (isExist.executeNow) {
-            const now = await this.roomModel.updateOne({ _id: isExist.room }, { status: "SUCCESS", $push: { services: isExist.service.toString() } });
-          } else {
-            const { startDate } = await this.contractModel.findOne({ "room._id": isExist.room.toString() });
-            const date = Number(dayjs(startDate).format('DD'));
-            const targetDay = dayjs().date(date);
-            let day;
-            const today = dayjs();
-            if (today.isSame(targetDay, 'date')) {
-              day = targetDay.format('DD-MM-YYYY');
-            } else if (today.isAfter(targetDay)) {
-              day = targetDay.add(1, "month").format('DD-MM-YYYY');
-            } else {
-              day = targetDay.format('DD-MM-YYYY');
-            }
-            const after = await this.registerServiceModel.updateOne({ _id: isExist._id }, { implementationDate: day });
-          }
-          return await this.registerServiceModel.updateOne(
-            { _id: id },
-            {
-              ...updateRegisterServiceDto,
-              updatedBy: {
-                _id: user._id,
-                email: user.email,
-                name: user.name
-              }
-            })
-        }
-
-      }
+    if (!isExist) {
+      throw new BadRequestException('Data not valid');
     }
-    throw new BadRequestException('Something wrong!');
+    //Case 1: add now and next month
+    if (isExist.type && isExist.executeNow) {
+      // Cập nhật dịch vụ ngay lập tức
+      return await Promise.all([
+        this.roomModel.updateOne(
+          { _id: isExist.room },
+          { $push: { services: isExist.service.toString() } }
+        ),
+        this.registerServiceModel.updateOne(
+          { _id: isExist._id },
+          { status: "SUCCESS" }
+        )
+      ]);
+    } else {
+      // Lấy ngày bắt đầu hợp đồng
+      const { startDate } = await this.contractModel.findOne({ "room._id": isExist.room.toString() });
+      const startDay = Number(dayjs(startDate).format('DD'));
+      const targetDay = dayjs().date(startDay);
+      const today = dayjs();
+
+      // Xác định ngày triển khai
+      const implementationDate = today.isAfter(targetDay,'date')
+        ? targetDay.add(1, "month").format('DD-MM-YYYY')
+        : targetDay.format('DD-MM-YYYY');
+
+      // Cập nhật trạng thái và ngày triển khai
+      return await this.registerServiceModel.updateOne(
+        { _id: isExist._id },
+        { status: "APPROVED", implementationDate }
+      );
+    }
+  
+    
+    
   }
 
   async remove(id: string, user: IUser) {
-    if (!mongoose.isObjectIdOrHexString(id)) {
-      throw new BadRequestException('Id is not valid!')
-    }
-    const isExist = await this.registerServiceModel.findOne({ _id: id, status: "PENDING" });
-    if (!isExist) {
-      throw new BadRequestException('Something wrong!');
-    }
-    await this.registerServiceModel.updateOne({ _id: id }, {
-      deletedBy: {
-        _id: user._id,
-        email: user.email,
-        name: user.name
-      }
-    })
-    return await this.registerServiceModel.softDelete({ _id: id });
+  if (!mongoose.isObjectIdOrHexString(id)) {
+    throw new BadRequestException('Id is not valid!')
   }
+  const isExist = await this.registerServiceModel.findOne({ _id: id, status: "PENDING" });
+  if (!isExist) {
+    throw new BadRequestException('Something wrong!');
+  }
+  await this.registerServiceModel.updateOne({ _id: id }, {
+    deletedBy: {
+      _id: user._id,
+      email: user.email,
+      name: user.name
+    }
+  })
+  return await this.registerServiceModel.softDelete({ _id: id });
+}
 
-  @Cron("*/5 * * * *")
-  async autoUpdateServiceForRoom() {
-    const today = dayjs().format('DD-MM-YYYY');
-    const requestsUser = await this.registerServiceModel.find({ status: "APPROVED" });
-    if (requestsUser && requestsUser.length > 0) {
-      for (const requestUser of requestsUser) {
-        if (requestUser.type && requestUser?.implementationDate === today) {
-          await this.roomModel.updateOne({ _id: requestUser.room }, { $push: { services: requestUser.service.toString() } });
-          await this.registerServiceModel.updateOne({ _id: requestUser._id }, { status: "SUCCESS" });
-
-        } else if (!requestUser.type && requestUser.implementationDate === today) {
-          await this.roomModel.updateOne({ _id: requestUser.room }, { $pull: { services: requestUser.service.toString() } });
-          await this.registerServiceModel.updateOne({ _id: requestUser._id }, { status: "SUCCESS" });
-
-        }
-      }
+@Cron("* * * * * *")
+async autoUpdateServiceForRoom() {
+  const today = dayjs().format('DD-MM-YYYY');
+  const requestsUser = await this.registerServiceModel.find({ status: "APPROVED" });
+  if (requestsUser?.length) {
+    for (const requestUser of requestsUser) {
+      if (requestUser.implementationDate !== today) continue;
+  
+      const updateAction = requestUser.type 
+        ? { $push: { services: requestUser.service.toString() } } 
+        : { $pull: { services: requestUser.service.toString() } };
+  
+      await Promise.all([
+        this.roomModel.updateOne({ _id: requestUser.room }, updateAction),
+        this.registerServiceModel.updateOne(
+          { _id: requestUser._id },
+          { status: "SUCCESS" }
+        )
+      ]);
     }
   }
+}
 }

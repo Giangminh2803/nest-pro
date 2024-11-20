@@ -14,6 +14,7 @@ export class CreateRoomDto {
     status: string;
 
     @IsNumber()
+    @IsOptional()
     area: number;
 
     @IsOptional()
@@ -21,6 +22,7 @@ export class CreateRoomDto {
     price: number;
 
     @IsArray()
+    @IsOptional()
     @IsString({ each: true })
     services: string[];
 
