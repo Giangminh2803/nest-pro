@@ -7,12 +7,12 @@ import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from 'src/users/user.interface';
 import mongoose from 'mongoose';
 import aqp from 'api-query-params';
-import { User, UserDocument } from 'src/users/schemas/user.schema';
 import { Room, RoomDocument } from 'src/rooms/schemas/room.schema';
 
 import { Cron } from '@nestjs/schedule';
 import dayjs from 'dayjs';
 import { MailerService } from '@nestjs-modules/mailer';
+import { ConfigService } from '@nestjs/config';
 
 const { ObjectId } = mongoose.Types;
 
@@ -21,7 +21,7 @@ export class ContractsService {
   constructor(
     private mailerService: MailerService,
     @InjectModel(Contract.name) private contractModel: SoftDeleteModel<ContractDocument>,
-    
+    private configService: ConfigService,
     @InjectModel(Room.name) private roomModel: SoftDeleteModel<RoomDocument>) { }
 
   async create(createContractDto: CreateContractDto, user: IUser) {
@@ -196,6 +196,7 @@ export class ContractsService {
   async autoSendEmailExpire() {
     const expireMonthDown = dayjs().add(45, 'days');
     const expireMonthUp = dayjs(expireMonthDown).add(1, 'days');
+    const urlFe = this.configService.get<string>('URL_FE') + "/user" ;
     const contracts = await this.contractModel.find({ endDate: { $gte: expireMonthDown, $lt: expireMonthUp }, status: 'ACTIVE' })
     for (const contract of contracts) {
       await this.mailerService.sendMail({
@@ -209,7 +210,7 @@ export class ContractsService {
           endDate: dayjs(contract.endDate).format('DD/MM/YYYY'),
           location: contract.room.roomName,
           price: contract.room.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + " đ",
-
+          url: urlFe
         }
 
       })

@@ -204,19 +204,21 @@ async autoUpdateServiceForRoom() {
   const requestsUser = await this.registerServiceModel.find({ status: "APPROVED" });
   if (requestsUser?.length) {
     for (const requestUser of requestsUser) {
-      if (requestUser.implementationDate !== today) continue;
-  
+      if (requestUser.implementationDate !== today) return;
+
       const updateAction = requestUser.type 
         ? { $push: { services: requestUser.service.toString() } } 
         : { $pull: { services: requestUser.service.toString() } };
   
-      await Promise.all([
-        this.roomModel.updateOne({ _id: requestUser.room }, updateAction),
-        this.registerServiceModel.updateOne(
+      const room = await  this.roomModel.updateOne({ _id: requestUser.room }, updateAction);
+      if(room){
+        await this.registerServiceModel.updateOne(
           { _id: requestUser._id },
           { status: "SUCCESS" }
         )
-      ]);
+      }
+        
+      
     }
   }
 }
