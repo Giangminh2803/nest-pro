@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { CreateContractDto } from './dto/create-contract.dto';
 import { UpdateContractDto } from './dto/update-contract.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -13,6 +18,9 @@ import { Cron } from '@nestjs/schedule';
 import dayjs from 'dayjs';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
+import { Invoice, InvoiceDocument } from '../invoices/schemas/invoice.schema';
+import { InvoicesService } from '../invoices/invoices.service';
+import { InvoicesModule } from '../invoices/invoices.module';
 
 const { ObjectId } = mongoose.Types;
 
@@ -20,38 +28,40 @@ const { ObjectId } = mongoose.Types;
 export class ContractsService {
   constructor(
     private mailerService: MailerService,
-    @InjectModel(Contract.name) private contractModel: SoftDeleteModel<ContractDocument>,
+    @InjectModel(Contract.name)
+    private contractModel: SoftDeleteModel<ContractDocument>,
     private configService: ConfigService,
-    @InjectModel(Room.name) private roomModel: SoftDeleteModel<RoomDocument>) { }
+    @InjectModel(Room.name) private roomModel: SoftDeleteModel<RoomDocument>,
+    @InjectModel(Invoice.name)
+    private invoiceModel: SoftDeleteModel<InvoiceDocument>,
+  ) {}
 
   async create(createContractDto: CreateContractDto, user: IUser) {
     const isExist = await this.roomModel.findOne({
       _id: createContractDto.room._id,
-      status: "OCCUPIED"
-    }
-    );
+      status: 'OCCUPIED',
+    });
     if (isExist) {
       throw new BadRequestException('Data is not valid!');
     }
-
     const contract = await this.contractModel.create({
       ...createContractDto,
+      isDeposit: false,
       innkeeper: {
         _id: user._id,
         name: user.name,
         phone: user.phone,
-        idCard: user.idCard
+        idCard: user.idCard,
       },
       createdBy: {
         _id: user._id,
         email: user.email,
-        name: user.name
-      }
-    })
+        name: user.name,
+      },
+    });
 
     const startDate = dayjs(contract.startDate);
     const endDate = dayjs(contract.endDate);
-
 
     const invoiceDetails = [];
     let currentDate = startDate;
@@ -67,12 +77,42 @@ export class ContractsService {
       });
       currentDate = nextDate;
     }
-    await this.contractModel.updateOne({ _id: contract._id }, { invoiceDetails: invoiceDetails });
-    await this.roomModel.updateOne({ _id: createContractDto.room._id }, { status: "OCCUPIED" });
+    await this.contractModel.updateOne(
+      { _id: contract._id },
+      { invoiceDetails: invoiceDetails },
+    );
+    await this.roomModel.updateOne(
+      { _id: createContractDto.room._id },
+      { status: 'OCCUPIED' },
+    );
 
+    //Create invoice deposit
+    if (!contract.isDeposit) {
+      await this.invoiceModel.create({
+        room: {
+          _id: createContractDto.room._id,
+          roomName: createContractDto.room.roomName,
+        },
+        tenant: {
+          _id: createContractDto.tenant._id,
+          name: createContractDto.tenant.name,
+          idCard: createContractDto.tenant.idCard,
+          phone: createContractDto.tenant.phone,
+        },
+        service: {
+          _id: createContractDto.room._id,
+          name: `Tiền cọc ${createContractDto.room.roomName}`,
+          unit: '1 tháng',
+          priceUnit: createContractDto.depositAmount,
+        },
+        amount: createContractDto.depositAmount,
+        send: false,
+        status: 'UNPAID',
+      });
+    }
     return {
       _id: contract._id,
-      createdAt: contract.createdAt
+      createdAt: contract.createdAt,
     };
   }
 
@@ -86,84 +126,92 @@ export class ContractsService {
     let totalPage = Math.ceil(totalDocument / defaultPageSize);
     let skip = (defaultCurrentPage - 1) * pageSize;
 
-
-    const result = await this.contractModel.find(filter)
+    const result = await this.contractModel
+      .find(filter)
       .skip(skip)
       .limit(defaultPageSize)
       .sort(sort as any)
       .select(projection)
       .populate(population)
-      .exec()
+      .exec();
 
     return {
       meta: {
         currentPage: defaultCurrentPage,
         pageSize: defaultPageSize,
         totalPage: totalPage,
-        totalDocument: totalDocument
+        totalDocument: totalDocument,
       },
-      result
-    }
-
+      result,
+    };
   }
 
   async findByTenantId(id: string) {
     if (!mongoose.isValidObjectId(id)) {
-      throw new BadRequestException('Id is not valid!')
+      throw new BadRequestException('Id is not valid!');
     }
-    return await this.contractModel.find({ "tenant._id": id })
-
+    return await this.contractModel.find({ 'tenant._id': id });
   }
+
   async findByTenantIdAndContractActive(id: string) {
     if (!mongoose.isValidObjectId(id)) {
-      throw new BadRequestException('Id is not valid!')
+      throw new BadRequestException('Id is not valid!');
     }
     const day = dayjs().startOf('day');
-    const tomorrow = day.add(1, "day").startOf('day').date();
-    return await this.contractModel.find(
-      {
-        $or: [
-          { "tenant._id": id },
-          { "tenant._id": new ObjectId(id) }
-        ]
-        ,
-        status: 'ACTIVE'
-      });
+    const tomorrow = day.add(1, 'day').startOf('day').date();
+    return await this.contractModel.find({
+      $or: [{ 'tenant._id': id }, { 'tenant._id': new ObjectId(id) }],
+      status: 'ACTIVE',
+    });
   }
 
   async findContractActive() {
     const today = dayjs();
-    return await this.contractModel.find({ status: 'ACTIVE', endDate: { $gte: today } });
-
+    return await this.contractModel.find({
+      status: 'ACTIVE',
+      endDate: { $gte: today },
+    });
   }
+
   async findRoomInContractActive(id: string) {
-
-    return await this.contractModel.findOne({ "room._id": id, status: 'ACTIVE' });
-
+    return await this.contractModel.findOne({
+      'room._id': id,
+      status: 'ACTIVE',
+    });
   }
 
   async update(id: string, updateContractDto: UpdateContractDto, user: IUser) {
     if (!mongoose.isValidObjectId(id)) {
-      throw new BadRequestException('Id is not valid!')
+      throw new BadRequestException('Id is not valid!');
     }
 
-    const isExist = await this.contractModel.findOne({ _id: id, isDeleted: false });
+    const isExist = await this.contractModel.findOne({
+      _id: id,
+      isDeleted: false,
+    });
     if (isExist) {
-        await this.contractModel.updateOne({ _id: id }, {
-        ...updateContractDto,
-        updatedBy: {
-          _id: user._id,
-          email: user.email,
-          name: user.name
-
+      await this.contractModel.updateOne(
+        { _id: id },
+        {
+          ...updateContractDto,
+          updatedBy: {
+            _id: user._id,
+            email: user.email,
+            name: user.name,
+          },
         },
-
-      });
-      const contract = await this.contractModel.updateOne({ _id: id, status: "CANCELED" }, {actualEndDate: dayjs()})
-      if(contract){
-        const room = await this.roomModel.updateOne({
-        _id: new ObjectId(isExist.room._id.toString())
-        }, {status: "AVAILABLE"})
+      );
+      const contract = await this.contractModel.updateOne(
+        { _id: id, status: 'CANCELED' },
+        { actualEndDate: dayjs() },
+      );
+      if (contract) {
+        const room = await this.roomModel.updateOne(
+          {
+            _id: new ObjectId(isExist.room._id.toString()),
+          },
+          { status: 'AVAILABLE' },
+        );
         return contract;
       }
     }
@@ -172,51 +220,60 @@ export class ContractsService {
 
   async remove(id: string, user: IUser) {
     if (!mongoose.isValidObjectId(id)) {
-      throw new BadRequestException('Id is not valid!')
+      throw new BadRequestException('Id is not valid!');
     }
-    await this.contractModel.updateOne({ _id: id }, {
-      deletedBy: {
-        _id: user._id,
-        email: user.email,
-        name: user.name
-      }
-    })
+    await this.contractModel.updateOne(
+      { _id: id },
+      {
+        deletedBy: {
+          _id: user._id,
+          email: user.email,
+          name: user.name,
+        },
+      },
+    );
     return await this.contractModel.softDelete({ _id: id });
   }
 
   @Cron('0 6 * * * *')
   async autoUpdateStatus() {
     const today = dayjs().startOf('day');
-    await this.contractModel.updateMany({ endDate: { $lt: today }, status: "ACTIVE" }, { status: "EXPIRED", actualEndDate: dayjs() })
+    await this.contractModel.updateMany(
+      { endDate: { $lt: today }, status: 'ACTIVE' },
+      {
+        status: 'EXPIRED',
+        actualEndDate: dayjs(),
+      },
+    );
   }
-
-
 
   @Cron('0 10 * * *')
   async autoSendEmailExpire() {
     const expireMonthDown = dayjs().add(45, 'days');
     const expireMonthUp = dayjs(expireMonthDown).add(1, 'days');
-    const urlFe = this.configService.get<string>('URL_FE') + "/user" ;
-    const contracts = await this.contractModel.find({ endDate: { $gte: expireMonthDown, $lt: expireMonthUp }, status: 'ACTIVE' })
+    const urlFe = this.configService.get<string>('URL_FE') + '/user';
+    const contracts = await this.contractModel.find({
+      endDate: { $gte: expireMonthDown, $lt: expireMonthUp },
+      status: 'ACTIVE',
+    });
     for (const contract of contracts) {
       await this.mailerService.sendMail({
         to: contract.tenant.email,
         from: '"Thông báo gia hạn hợp đồng" <abc@gmail.com>',
-        subject: "Gia Hạn Hợp Đồng",
+        subject: 'Gia Hạn Hợp Đồng',
         template: 'expireContract.hbs',
         context: {
           receiver: contract.tenant.name,
           startDate: dayjs(contract.startDate).format('DD/MM/YYYY'),
           endDate: dayjs(contract.endDate).format('DD/MM/YYYY'),
           location: contract.room.roomName,
-          price: contract.room.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + " đ",
-          url: urlFe
-        }
-
-      })
+          price:
+            contract.room.price
+              .toString()
+              .replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' đ',
+          url: urlFe,
+        },
+      });
     }
-
-
   }
-
 }

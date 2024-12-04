@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { PermissionService } from './permission.service';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
@@ -11,21 +20,24 @@ export class PermissionController {
 
   @ResponseMessage('Successfully created permissions')
   @Post()
-  create(@Body() createPermissionDto: CreatePermissionDto, @User() user: IUser) {
+  create(
+    @Body() createPermissionDto: CreatePermissionDto,
+    @User() user: IUser,
+  ) {
     return this.permissionService.create(createPermissionDto, user);
   }
 
   @Get()
-  @ResponseMessage('Fetch Permission with paginate!')
+  @ResponseMessage('Fetch Permission with paginate abc!')
   findAll(
-    @Query("current") current: string,
-    @Query("pageSize") pageSize: string,
+    @Query('current') current: string,
+    @Query('pageSize') pageSize: string,
     @Query() qs: string,
   ) {
     return this.permissionService.findAll(+current, +pageSize, qs);
   }
 
-  @ResponseMessage('Fetch Permission with id!')
+  @ResponseMessage('Fetch Permission with id for!')
   @Post(':id')
   findOne(@Param('id') id: string) {
     return this.permissionService.findOne(id);
@@ -33,7 +45,11 @@ export class PermissionController {
 
   @ResponseMessage('Updated successfully!')
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePermissionDto: UpdatePermissionDto, @User() user: IUser) {
+  update(
+    @Param('id') id: string,
+    @Body() updatePermissionDto: UpdatePermissionDto,
+    @User() user: IUser,
+  ) {
     return this.permissionService.update(id, updatePermissionDto, user);
   }
 

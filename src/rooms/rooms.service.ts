@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 import { Room, RoomDocument } from './schemas/room.schema';
@@ -13,24 +18,27 @@ import { ContractsService } from 'src/contracts/contracts.service';
 export class RoomsService {
   constructor(
     @InjectModel(Room.name) private roomModel: SoftDeleteModel<RoomDocument>,
+    @Inject(forwardRef(() => ContractsService))
     private contractService: ContractsService,
-
-  ) { }
+  ) {}
 
   async create(createRoomDto: CreateRoomDto, user: IUser) {
-    const isRoomExist = await this.roomModel.findOne({ roomName: createRoomDto.roomName });
+    const isRoomExist = await this.roomModel.findOne({
+      roomName: createRoomDto.roomName,
+    });
     if (!isRoomExist) {
       const room = await this.roomModel.create({
-        ...createRoomDto, createdBy: {
+        ...createRoomDto,
+        createdBy: {
           _id: user._id,
           email: user.email,
-          name: user.name
-        }
+          name: user.name,
+        },
       });
       return {
         _id: room._id,
-        createdAt: room.createdAt
-      }
+        createdAt: room.createdAt,
+      };
     }
 
     throw new BadRequestException('Room number already exists');
@@ -46,75 +54,75 @@ export class RoomsService {
     let totalPage = Math.ceil(totalDocument / defaultPageSize);
     let skip = (defaultCurrentPage - 1) * pageSize;
 
-
-    const result = await this.roomModel.find(filter)
+    const result = await this.roomModel
+      .find(filter)
       .skip(skip)
       .limit(defaultPageSize)
       .sort(sort as any)
       .select(projection)
       .populate(population)
-      .exec()
+      .exec();
 
     return {
       meta: {
         currentPage: defaultCurrentPage,
         pageSize: defaultPageSize,
         totalPage: totalPage,
-        totalDocument: totalDocument
+        totalDocument: totalDocument,
       },
-      result
-    }
-
+      result,
+    };
   }
 
-  findById(id:string) {
+  findById(id: string) {
     if (!mongoose.isValidObjectId(id)) {
-      throw new BadRequestException('Id Room is not valid!')
+      throw new BadRequestException('Id Room is not valid!');
     }
 
     return this.roomModel.findOne({ _id: id });
-
   }
-
-
 
   async update(id: string, updateRoomDto: UpdateRoomDto, user: IUser) {
     if (!mongoose.isValidObjectId(id)) {
-      throw new BadRequestException('Id Room is not valid!')
+      throw new BadRequestException('Id Room is not valid!');
     }
 
-    if (updateRoomDto.status === "ACTIVE") {
+    if (updateRoomDto.status === 'ACTIVE') {
       const isExist = await this.contractService.findRoomInContractActive(id);
       if (isExist) {
         throw new BadRequestException('Room has been rented!');
       }
     }
-    
-    const room = await this.roomModel.updateOne({ _id: id }, {
-      ...updateRoomDto,
-      updatedBy: {
-        _id: user._id,
-        email: user.email,
-        name: user.name
-      }
-    })
+
+    const room = await this.roomModel.updateOne(
+      { _id: id },
+      {
+        ...updateRoomDto,
+        updatedBy: {
+          _id: user._id,
+          email: user.email,
+          name: user.name,
+        },
+      },
+    );
     return room;
   }
 
   async remove(id: string, user: IUser) {
     if (!mongoose.isValidObjectId(id)) {
-      throw new BadRequestException('Id Room is not valid!')
+      throw new BadRequestException('Id Room is not valid!');
     }
-    await this.roomModel.updateOne({ _id: id }, {
-      deletedBy: {
-        _id: user._id,
-        email: user.email,
-        name: user.name
-      }
-    })
+    await this.roomModel.updateOne(
+      { _id: id },
+      {
+        deletedBy: {
+          _id: user._id,
+          email: user.email,
+          name: user.name,
+        },
+      },
+    );
 
     return await this.roomModel.softDelete({ _id: id });
   }
-
-  
 }

@@ -1,79 +1,95 @@
-
-import { Type } from "class-transformer";
-import { IsDate, IsDateString, IsDefined, IsEmail, IsNotEmptyObject, IsNumber, IsNumberString, IsObject, IsOptional, IsString, Length, length, ValidateNested, } from "class-validator"
-import { RmOptions } from "fs";
-import mongoose from "mongoose";
+import { Type } from 'class-transformer';
+import {
+  IsBoolean,
+  IsDate,
+  IsDateString,
+  IsDefined,
+  IsEmail,
+  IsNotEmptyObject,
+  IsNumber,
+  IsNumberString,
+  IsObject,
+  IsOptional,
+  IsString,
+  Length,
+  length,
+  ValidateNested,
+} from 'class-validator';
+import { RmOptions } from 'fs';
+import mongoose from 'mongoose';
 
 class roomDTO {
-    @IsString()
-    _id: mongoose.Schema.Types.ObjectId;
+  @IsString()
+  _id: mongoose.Schema.Types.ObjectId;
 
-    @IsString()
-    roomName: string
+  @IsString()
+  roomName: string;
 
-    @IsNumber()
-    price: number
+  @IsNumber()
+  price: number;
 }
 
 class tenantDTO {
-    @IsString()
-    _id: mongoose.Schema.Types.ObjectId;
+  @IsString()
+  _id: mongoose.Schema.Types.ObjectId;
 
-    @IsString()
-    name: string
-    
-    @IsEmail()
-    @IsString()
-    email: string
+  @IsString()
+  name: string;
 
-    @IsNumberString()
-    @Length(12)
-    idCard: string
+  @IsEmail()
+  @IsString()
+  email: string;
 
-    @IsNumberString()
-    @Length(10)
-    phone: string
+  @IsNumberString()
+  @Length(12)
+  idCard: string;
 
-    @IsString()
-    address: string
+  @IsNumberString()
+  @Length(10)
+  phone: string;
+
+  @IsString()
+  address: string;
 }
+
 export class CreateContractDto {
+  @IsDefined()
+  @IsNotEmptyObject()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => roomDTO)
+  room: roomDTO;
 
-    
-    @IsDefined()
-    @IsNotEmptyObject()
-    @IsObject()
-    @ValidateNested()
-    @Type(() => roomDTO)
-    room: roomDTO;
+  @IsDefined()
+  @IsNotEmptyObject()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => tenantDTO)
+  tenant: tenantDTO;
 
-    @IsDefined()
-    @IsNotEmptyObject()
-    @IsObject()
-    @ValidateNested()
-    @Type(() => tenantDTO)
-    tenant: tenantDTO;
+  @IsOptional()
+  @IsDateString()
+  startDate: Date;
 
-    @IsOptional()
-    @IsDateString()
-    startDate: Date;
+  @IsDateString()
+  @IsOptional()
+  endDate: Date;
 
-    @IsDateString()
-    @IsOptional()
-    endDate: Date;
+  @IsNumber()
+  depositAmount: number;
 
-    @IsNumber()
-    depositAmount: number
+  @IsOptional()
+  @IsNumber()
+  rentCycleCount: number;
 
-    @IsOptional()
-    @IsNumber()
-    rentCycleCount: number
+  @IsOptional()
+  @IsBoolean()
+  isDeposit: boolean;
 
-    @IsString()
-    status: string;
+  @IsString()
+  status: string;
 
-    @IsString()
-    @IsOptional()
-    address: string;
-
+  @IsString()
+  @IsOptional()
+  address: string;
 }
