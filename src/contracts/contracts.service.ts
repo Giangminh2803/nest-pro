@@ -108,6 +108,8 @@ export class ContractsService {
         amount: createContractDto.depositAmount,
         send: false,
         status: 'UNPAID',
+        description: `Tiền cọc ${createContractDto.room.roomName}`,
+        month: dayjs().format('MM-YYYY').toString(),
       });
     }
     return {
