@@ -21,6 +21,9 @@ export class RequestsContract {
     type: boolean;
 
     @Prop()
+    amount: number;
+
+    @Prop()
     createdAt: Date;
 
     @Prop()

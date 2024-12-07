@@ -1,4 +1,4 @@
-import { IsDate, IsNotEmpty, IsOptional } from "class-validator";
+import { IsDate, IsNotEmpty, IsNumber, IsOptional } from "class-validator";
 import mongoose from "mongoose";
 
 export class CreateRequestsContractDto {
@@ -16,4 +16,7 @@ export class CreateRequestsContractDto {
     @IsOptional()
     type: boolean
 
+    @IsNumber()
+    @IsOptional()
+    amount: number;
 }
