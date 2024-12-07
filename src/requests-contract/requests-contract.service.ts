@@ -42,7 +42,7 @@ export class RequestsContractsService {
 
       }
     } catch (error) {
-      return error
+      throw new BadRequestException("Contract not yet renewed!");
     }
     
   }
