@@ -1,7 +1,7 @@
 import { IsDate, IsNotEmpty, IsOptional } from "class-validator";
 import mongoose from "mongoose";
 
-export class CreateRenewalRequestDto {
+export class CreateRequestsContractDto {
     @IsNotEmpty({message:'Contract is not empty'})
     contract: [mongoose.Schema.Types.ObjectId];
 

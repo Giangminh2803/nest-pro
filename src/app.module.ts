@@ -19,7 +19,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
 import { APP_GUARD } from '@nestjs/core';
 import { RegisterServiceModule } from './register-service/register-service.module';
-import { RenewalRequestsModule } from './renewal-requests/renewal-requests.module';
+import { RequestsContractModule } from './requests-contract/requests-contract.module';
 
 
 
@@ -58,7 +58,7 @@ import { RenewalRequestsModule } from './renewal-requests/renewal-requests.modul
     DatabasesModule,
     MailModule,
     RegisterServiceModule,
-    RenewalRequestsModule,
+    RequestsContractModule,
    
   ],
   controllers: [AppController],

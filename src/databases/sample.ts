@@ -796,9 +796,9 @@ export const INIT_PERMISSION = [
   }, //Soft-delete register service!
   {
     name: 'Create a Renew requests',
-    apiPath: '/api/v1/renewal-requests',
+    apiPath: '/api/v1/requests-contract',
     method: 'POST',
-    module: 'Renewal-Requests',
+    module: 'Requests Contract',
     createdBy: {
       _id: '',
       email: 'admin@gmail.com',
@@ -812,9 +812,9 @@ export const INIT_PERMISSION = [
   }, //Create a Renew requests
   {
     name: 'Update renew request!',
-    apiPath: '/api/v1/renewal-requests/:id',
+    apiPath: '/api/v1/requests-contract/:id',
     method: 'PATCH',
-    module: 'Renewal-Requests',
+    module: 'Requests Contract',
     createdBy: {
       _id: '',
       email: 'admin@gmail.com',
@@ -828,9 +828,9 @@ export const INIT_PERMISSION = [
   }, //Update renew request!
   {
     name: 'Fetch a renewal requests',
-    apiPath: '/api/v1/renewal-requests/:id',
+    apiPath: '/api/v1/requests-contract/:id',
     method: 'GET',
-    module: 'Register-Service',
+    module: 'Requests Contract',
     createdBy: {
       _id: '',
       email: 'admin@gmail.com',
@@ -844,9 +844,9 @@ export const INIT_PERMISSION = [
   }, //Fetch a renewal requests
   {
     name: 'Fetch renewal requests with paginate!',
-    apiPath: '/api/v1/renewal-requests',
+    apiPath: '/api/v1/requests-contract',
     method: 'GET',
-    module: 'Renewal Requests',
+    module: 'Requests Contract',
     createdBy: {
       _id: '',
       email: 'admin@gmail.com',
@@ -857,12 +857,12 @@ export const INIT_PERMISSION = [
     updatedAt: '',
     __v: 0,
     updatedBy: {},
-  }, //Fetch renewal-requests with paginate!
+  }, //Fetch requests-contract with paginate!
   {
     name: 'Soft-delete renewal requests!',
-    apiPath: '/api/v1/renewal-requests/:id',
+    apiPath: '/api/v1/requests-contract/:id',
     method: 'DELETE',
-    module: 'Renewal Requests',
+    module: 'Requests Contract',
     createdBy: {
       _id: '',
       email: 'admin@gmail.com',

@@ -1,36 +1,37 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateRenewalRequestDto } from './dto/create-renewal-request.dto';
-import { UpdateRenewalRequestDto } from './dto/update-renewal-request.dto';
+;
 import { IUser } from 'src/users/user.interface';
-import { RenewalRequest, RenewalRequestDocument } from './schemas/renewal-request.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Contract, ContractDocument } from 'src/contracts/schemas/contract.schema';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import dayjs from 'dayjs';
 import aqp from 'api-query-params';
 import mongoose from 'mongoose';
+import { RequestsContract, RequestsContractDocument } from './schemas/requests-contract.schema';
+import { CreateRequestsContractDto } from './dto/create-requests-contract.dto';
+import { UpdateRequestsContractDto } from './dto/update-requests-contract.dto';
 
 
 @Injectable()
-export class RenewalRequestsService {
+export class RequestsContractsService {
   constructor(
     @InjectModel(Contract.name)
     private contractModel: SoftDeleteModel<ContractDocument>,
 
-    @InjectModel(RenewalRequest.name)
-    private renewalRequestModel: SoftDeleteModel<RenewalRequestDocument>,
+    @InjectModel(RequestsContract.name)
+    private requestsContractModel: SoftDeleteModel<RequestsContractDocument>,
     
   ) {}
 
-  async create(createRenewalRequestDto: CreateRenewalRequestDto, user: IUser) {
+  async create(createRequestsContractDto: CreateRequestsContractDto, user: IUser) {
     try {
       const contract = await this.contractModel.findOne({
-        _id: createRenewalRequestDto.contract
+        _id: createRequestsContractDto.contract
       })
       if(contract){
         const expireDay = dayjs(contract.endDate);
         if(expireDay.isBefore(dayjs().add(1, "month")) && expireDay.startOf('day').isAfter(dayjs().startOf("day"))){
-          const requestRenew = await this.renewalRequestModel.create({...createRenewalRequestDto, status: "PENDING"});
+          const requestRenew = await this.requestsContractModel.create({...createRequestsContractDto, status: "PENDING"});
           return {
             _id: requestRenew._id,
             createdAt: requestRenew.createdAt
@@ -52,11 +53,11 @@ export class RenewalRequestsService {
     delete filter.pageSize;
     const defaultCurrentPage = currentPage ? currentPage : 1;
     const defaultPageSize = pageSize ? pageSize : 5;
-    const totalDocument = (await this.renewalRequestModel.find(filter)).length;
+    const totalDocument = (await this.requestsContractModel.find(filter)).length;
     let totalPage = Math.ceil(totalDocument / defaultPageSize);
     let skip = (defaultCurrentPage - 1) * pageSize;
 
-    const result = await this.renewalRequestModel
+    const result = await this.requestsContractModel
       .find(filter)
       .skip(skip)
       .limit(defaultPageSize)
@@ -81,18 +82,18 @@ export class RenewalRequestsService {
       throw new BadRequestException('Id is not valid!');
     }
     try {
-      return await this.renewalRequestModel.find({ _id: id });
+      return await this.requestsContractModel.find({ _id: id });
     } catch (error) {
       throw new BadRequestException("Something wrong in server!");
     }
   }
 
-  async update(id: string, updateRenewalRequestDto: UpdateRenewalRequestDto, user: IUser) {
+  async update(id: string, updateRequestsContractDto: UpdateRequestsContractDto, user: IUser) {
     if (!mongoose.isValidObjectId(id)) {
       throw new BadRequestException('Id is not valid!');
     }
     try {
-      const contract = await this.renewalRequestModel.updateOne({_id: id}, {...updateRenewalRequestDto, updatedBy:{
+      const contract = await this.requestsContractModel.updateOne({_id: id}, {...updateRequestsContractDto, updatedBy:{
         _id: user._id,
         email: user.email,
         name: user.name
@@ -109,12 +110,12 @@ export class RenewalRequestsService {
       throw new BadRequestException('Id is not valid!');
     }
     try {
-      await this.renewalRequestModel.updateOne({_id: id}, {updatedBy:{
+      await this.requestsContractModel.updateOne({_id: id}, {updatedBy:{
         _id: user._id,
         email: user.email,
         name: user.name
       }})
-      return await this.renewalRequestModel.softDelete({_id: id});
+      return await this.requestsContractModel.softDelete({_id: id});
     } catch (error) {
       throw new BadRequestException("Something wrong in server!")
     }

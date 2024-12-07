@@ -3,10 +3,10 @@ import mongoose, { HydratedDocument } from 'mongoose';
 import { Contract } from 'src/contracts/schemas/contract.schema';
 import { User } from 'src/users/schemas/user.schema';
 
-export type RenewalRequestDocument = HydratedDocument<RenewalRequest>;
+export type RequestsContractDocument = HydratedDocument<RequestsContract>;
 
 @Schema({ timestamps: true })
-export class RenewalRequest {
+export class RequestsContract {
     
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Contract.name })
     contract: mongoose.Schema.Types.ObjectId;
@@ -55,4 +55,4 @@ export class RenewalRequest {
 
 }
 
-export const RenewalRequestSchema = SchemaFactory.createForClass(RenewalRequest);
+export const RequestsContractSchema = SchemaFactory.createForClass(RequestsContract);
