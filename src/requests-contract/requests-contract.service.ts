@@ -30,14 +30,14 @@ export class RequestsContractsService {
       })
       if(contract){
         const expireDay = dayjs(contract.endDate);
-        if(expireDay.isBefore(dayjs().add(1, "month")) && expireDay.startOf('day').isAfter(dayjs().startOf("day"))){
+        if(expireDay.isBefore(dayjs().add(15, "day")) && expireDay.startOf('day').isAfter(dayjs().startOf("day"))){
           const requestRenew = await this.requestsContractModel.create({...createRequestsContractDto, status: "PENDING"});
           return {
             _id: requestRenew._id,
             createdAt: requestRenew.createdAt
           }
         }else{
-          return "Contract not yet renewed!"
+          throw new BadRequestException("Contract not yet renewed!");
         }
 
       }
