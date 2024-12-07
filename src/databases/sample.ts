@@ -794,4 +794,84 @@ export const INIT_PERMISSION = [
     __v: 0,
     updatedBy: {},
   }, //Soft-delete register service!
+  {
+    name: 'Create a Renew requests',
+    apiPath: '/api/v1/renewal-requests',
+    method: 'POST',
+    module: 'Renewal-Requests',
+    createdBy: {
+      _id: '',
+      email: 'admin@gmail.com',
+    },
+    isDeleted: false,
+    deletedAt: null,
+    createdAt: '2024-08-17T04:41:40.369Z',
+    updatedAt: '',
+    __v: 0,
+    updatedBy: {},
+  }, //Create a Renew requests
+  {
+    name: 'Update renew request!',
+    apiPath: '/api/v1/renewal-requests/:id',
+    method: 'PATCH',
+    module: 'Renewal-Requests',
+    createdBy: {
+      _id: '',
+      email: 'admin@gmail.com',
+    },
+    isDeleted: false,
+    deletedAt: null,
+    createdAt: '2024-08-17T04:41:40.369Z',
+    updatedAt: '',
+    __v: 0,
+    updatedBy: {},
+  }, //Update renew request!
+  {
+    name: 'Fetch a renewal requests',
+    apiPath: '/api/v1/renewal-requests/:id',
+    method: 'GET',
+    module: 'Register-Service',
+    createdBy: {
+      _id: '',
+      email: 'admin@gmail.com',
+    },
+    isDeleted: false,
+    deletedAt: null,
+    createdAt: '2024-08-17T04:41:40.369Z',
+    updatedAt: '',
+    __v: 0,
+    updatedBy: {},
+  }, //Fetch a renewal requests
+  {
+    name: 'Fetch renewal requests with paginate!',
+    apiPath: '/api/v1/renewal-requests',
+    method: 'GET',
+    module: 'Renewal Requests',
+    createdBy: {
+      _id: '',
+      email: 'admin@gmail.com',
+    },
+    isDeleted: false,
+    deletedAt: null,
+    createdAt: '2024-08-17T04:41:40.369Z',
+    updatedAt: '',
+    __v: 0,
+    updatedBy: {},
+  }, //Fetch renewal-requests with paginate!
+  {
+    name: 'Soft-delete renewal requests!',
+    apiPath: '/api/v1/renewal-requests/:id',
+    method: 'DELETE',
+    module: 'Renewal Requests',
+    createdBy: {
+      _id: '',
+      email: 'admin@gmail.com',
+    },
+    isDeleted: false,
+    deletedAt: null,
+    createdAt: '2024-08-17T04:41:40.369Z',
+    updatedAt: '', 
+    __v: 0,
+    updatedBy: {},
+  }, //Soft-delete renewal requests!
 ];

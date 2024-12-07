@@ -47,6 +47,7 @@ export class ContractsService {
     const contract = await this.contractModel.create({
       ...createContractDto,
       isDeposit: false,
+      isRenewed: false,
       innkeeper: {
         _id: user._id,
         name: user.name,
@@ -154,7 +155,7 @@ export class ContractsService {
     }
     return await this.contractModel.find({ 'tenant._id': id });
   }
-
+  
   async findByTenantIdAndContractActive(id: string) {
     if (!mongoose.isValidObjectId(id)) {
       throw new BadRequestException('Id is not valid!');

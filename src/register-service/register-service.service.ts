@@ -217,8 +217,7 @@ async autoUpdateServiceForRoom() {
           { status: "SUCCESS" }
         )
       }
-        
-      
+
     }
   }
 }

@@ -60,6 +60,9 @@ export class Contract {
   isDeposit: boolean;
 
   @Prop()
+  isRenewed: boolean;
+
+  @Prop()
   address: string;
 
   @Prop()

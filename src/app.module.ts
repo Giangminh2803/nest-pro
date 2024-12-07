@@ -19,7 +19,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
 import { APP_GUARD } from '@nestjs/core';
 import { RegisterServiceModule } from './register-service/register-service.module';
-import { NotificationsModule } from './notifications/notifications.module';
+import { RenewalRequestsModule } from './renewal-requests/renewal-requests.module';
 
 
 
@@ -58,7 +58,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     DatabasesModule,
     MailModule,
     RegisterServiceModule,
-    NotificationsModule,
+    RenewalRequestsModule,
    
   ],
   controllers: [AppController],
