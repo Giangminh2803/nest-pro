@@ -18,6 +18,9 @@ export class RenewalRequest {
     status: string;
 
     @Prop()
+    type: boolean;
+
+    @Prop()
     createdAt: Date;
 
     @Prop()

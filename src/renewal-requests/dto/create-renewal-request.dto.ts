@@ -12,5 +12,8 @@ export class CreateRenewalRequestDto {
     @IsOptional()
     status: string
 
+    @IsNotEmpty()
+    @IsOptional()
+    type: boolean
 
 }

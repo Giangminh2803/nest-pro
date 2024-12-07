@@ -224,7 +224,7 @@ export class InvoicesService {
     const totalDocument = (await this.invoiceModel.find(filter)).length;
     let totalPage = Math.ceil(totalDocument / defaultPageSize);
     let skip = (defaultCurrentPage - 1) * pageSize;
-
+    
     const result = await this.invoiceModel
       .find(filter)
       .skip(skip)
