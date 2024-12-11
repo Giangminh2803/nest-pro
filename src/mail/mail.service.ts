@@ -72,8 +72,8 @@ export class MailService {
           }
           await this.mailerService.sendMail({
             to: user.email,
-            from: '"Thông báo hoá đơn" <abc@gmail.com>',
-            subject: "Hoá đơn dịch vụ",
+            from: '"Invoice notification" <abc@gmail.com>',
+            subject: "Service invoice",
             template: 'invoiceT.hbs',
             context: {
               receiver: user.name,

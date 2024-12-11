@@ -13,14 +13,12 @@ import { IUser } from 'src/users/user.interface';
 import mongoose from 'mongoose';
 import aqp from 'api-query-params';
 import { Room, RoomDocument } from 'src/rooms/schemas/room.schema';
-
 import { Cron } from '@nestjs/schedule';
 import dayjs from 'dayjs';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
 import { Invoice, InvoiceDocument } from '../invoices/schemas/invoice.schema';
-import { InvoicesService } from '../invoices/invoices.service';
-import { InvoicesModule } from '../invoices/invoices.module';
+
 
 const { ObjectId } = mongoose.Types;
 
@@ -102,14 +100,14 @@ export class ContractsService {
         },
         service: {
           _id: createContractDto.room._id,
-          name: `Tiền cọc ${createContractDto.room.roomName}`,
-          unit: '1 tháng',
+          name: `Rental ${createContractDto.room.roomName}`,
+          unit: '1 month',
           priceUnit: createContractDto.depositAmount,
         },
         amount: createContractDto.depositAmount,
         send: false,
         status: 'UNPAID',
-        description: `Tiền cọc ${createContractDto.room.roomName}`,
+        description: `Rental ${createContractDto.room.roomName}`,
         month: dayjs().format('MM-YYYY').toString(),
       });
     }
@@ -245,9 +243,16 @@ export class ContractsService {
       { endDate: { $lt: today }, status: 'ACTIVE' },
       {
         status: 'EXPIRED',
-        actualEndDate: dayjs(),
+       
       },
     );
+    await this.contractModel.updateMany(
+      { actualEndDate: { $lt: today }, status: 'ACTIVE' },
+      {
+        status: 'CANCEL',
+      },
+    );
+    
   }
 
   @Cron('0 10 * * *')
@@ -262,8 +267,8 @@ export class ContractsService {
     for (const contract of contracts) {
       await this.mailerService.sendMail({
         to: contract.tenant.email,
-        from: '"Thông báo gia hạn hợp đồng" <abc@gmail.com>',
-        subject: 'Gia Hạn Hợp Đồng',
+        from: '"Notice of contract extension" <abc@gmail.com>',
+        subject: 'Contract Renewal',
         template: 'expireContract.hbs',
         context: {
           receiver: contract.tenant.name,

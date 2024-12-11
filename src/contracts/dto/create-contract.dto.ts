@@ -87,6 +87,10 @@ export class CreateContractDto {
   isDeposit: boolean;
 
   @IsOptional()
+  @IsNumber()
+  numberPeople: number;
+
+  @IsOptional()
   @IsBoolean()
   isRenewed: boolean;
 

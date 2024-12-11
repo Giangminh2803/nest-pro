@@ -18,6 +18,9 @@ export class RequestsContract {
     status: string;
 
     @Prop()
+    description: string;
+
+    @Prop()
     type: boolean;
 
     @Prop()

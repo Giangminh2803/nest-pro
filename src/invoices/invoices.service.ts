@@ -135,7 +135,7 @@ export class InvoicesService {
                     month: date,
                     send: false,
                     status: 'UNPAID',
-                    description: `Dịch vụ ${otherServices.serviceName} ${date}`,
+                    description: `Service ${otherServices.serviceName} ${date}`,
                   });
                 }
               }
@@ -197,8 +197,8 @@ export class InvoicesService {
                 'tenant.phone': contract.tenant.phone,
 
                 'service._id': contract.room._id,
-                'service.name': 'Tiền nhà',
-                'service.unit': 'tháng',
+                'service.name': 'Rental',
+                'service.unit': 'month',
                 'service.priceUnit': contract.room.price,
 
                 send: false,
@@ -206,7 +206,7 @@ export class InvoicesService {
                 month: date,
                 nextPaymentDate: dayjs().add(contract.rentCycleCount, 'months'),
                 status: 'UNPAID',
-                description: `Tiền phòng ${contract.room.roomName} tháng ${date}`,
+                description: `Rental ${contract.room.roomName} month ${date}`,
               });
             }
           }
