@@ -13,11 +13,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import { ServicesService } from 'src/services/services.service';
 import aqp from 'api-query-params';
 import mongoose from 'mongoose';
-import { Cron } from '@nestjs/schedule';
+import { Cron, SchedulerRegistry } from '@nestjs/schedule';
 import dayjs from 'dayjs';
 import { UsersService } from 'src/users/users.service';
 import { ContractsService } from 'src/contracts/contracts.service';
 import { RoomsService } from 'src/rooms/rooms.service';
+import { CronJob } from 'cron';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class InvoicesService {
@@ -28,7 +30,13 @@ export class InvoicesService {
     private userService: UsersService,
     private roomService: RoomsService,
     private contractService: ContractsService,
-  ) {}
+    private schedulerRegistry: SchedulerRegistry,
+    private configService: ConfigService,
+  ) {
+   
+    this.autoCreateInvoice();
+    this.autoCreateInvoiceRent();
+  }
 
   async updateData(_id: string, data: any) {
     const service = await this.servicesService.findOne(data.serviceId);
@@ -86,64 +94,71 @@ export class InvoicesService {
     };
   }
 
-  //@Cron('0 0 * * *')
-  //@Cron('* * * * * *')
-  async autoCreateInvoice() {
-    const date = dayjs().subtract(1, 'month').format('MM-YYYY');
-    const users = await this.userService.findUserByRole();
-    for (const user of users) {
-      const contracts =
-        await this.contractService.findByTenantIdAndContractActive(
-          user._id.toString(),
-        );
-      if (contracts && contracts.length > 0) {
-        for (const contract of contracts) {
-          const isCheck = this.checkDateInvoice(contract.startDate);
-          if (isCheck) {
-            const room = await this.roomService.findById(
-              contract.room._id.toString(),
+  
+
+  autoCreateInvoice() {
+    const cronExpression = this.configService.get<string>('TIME_CREATE_INVOICE');
+    const job = new CronJob(cronExpression,async () => {
+        const date = dayjs().subtract(1, 'month').format('MM-YYYY');
+        const users = await this.userService.findUserByRole();
+        for (const user of users) {
+          const contracts =
+            await this.contractService.findByTenantIdAndContractActive(
+              user._id.toString(),
             );
-            const services = room.services;
-            for (const service of services) {
-              const otherServices = await this.servicesService.findOne(
-                service.toString(),
-              );
-              if (
-                otherServices.type !== 'WATER' &&
-                otherServices.type !== 'ELECTRICITY'
-              ) {
-                const isExist = await this.invoiceModel.findOne({
-                  'room._id:': room._id,
-                  'tenant._id': user._id,
-                  'service._id': otherServices._id,
-                  month: date,
-                });
-                if (!isExist) {
-                  await this.invoiceModel.create({
-                    'room._id:': room._id,
-                    'tenant._id': user._id,
-                    'service._id': otherServices._id,
-                    'room.roomName:': room.roomName,
-                    'tenant.name': user.name,
-                    'service.name': otherServices.serviceName,
-                    'tenant.email': user.email,
-                    'tenant.idCard': user.idCard,
-                    'service.unit': otherServices.unit,
-                    'tenant.phone': user.phone,
-                    'service.priceUnit': otherServices.price,
-                    amount: otherServices.price,
-                    month: date,
-                    send: false,
-                    status: 'UNPAID',
-                    description: `Service ${otherServices.serviceName} ${date}`,
-                  });
+          if (contracts && contracts.length > 0) {
+            for (const contract of contracts) {
+              const isCheck = this.checkDateInvoice(contract.startDate);
+              if (isCheck) {
+                const room = await this.roomService.findById(
+                  contract.room._id.toString(),
+                );
+                const services = room.services;
+                for (const service of services) {
+                  const otherServices = await this.servicesService.findOne(
+                    service.toString(),
+                  );
+                  if (
+                    otherServices.type !== 'WATER' &&
+                    otherServices.type !== 'ELECTRICITY'
+                  ) {
+                    const isExist = await this.invoiceModel.findOne({
+                      'room._id:': room._id,
+                      'tenant._id': user._id,
+                      'service._id': otherServices._id,
+                      month: date,
+                    });
+                    if (!isExist) {
+                      await this.invoiceModel.create({
+                        'room._id:': room._id,
+                        'tenant._id': user._id,
+                        'service._id': otherServices._id,
+                        'room.roomName:': room.roomName,
+                        'tenant.name': user.name,
+                        'service.name': otherServices.serviceName,
+                        'tenant.email': user.email,
+                        'tenant.idCard': user.idCard,
+                        'service.unit': otherServices.unit,
+                        'tenant.phone': user.phone,
+                        'service.priceUnit': otherServices.price,
+                        amount: otherServices.price,
+                        month: date,
+                        send: false,
+                        status: 'UNPAID',
+                        description: `Service ${otherServices.serviceName} ${date}`,
+                      });
+                    }
+                  }
                 }
               }
             }
           }
         }
-      }
-    }
+      
+      
+    });
+    this.schedulerRegistry.addCronJob('Auto Create Invoice', job);
+    job.start();
   }
 
   checkDateInvoice(contractDate: Date) {
@@ -160,59 +175,67 @@ export class InvoicesService {
     return false;
   }
 
-  //@Cron('* 0 0 * * *')
-  //@Cron('* * * * * *')
-  async autoCreateInvoiceRent() {
-    let date = '';
-    const today = dayjs().format('YYYY-MM-DD');
-    const contracts = await this.contractService.findContractActive();
-    if (contracts && contracts.length > 0) {
-      for (const contract of contracts) {
-        for (let i = 1; i <= contract.rentCycleCount; i++) {
-          date += dayjs().add(i, 'month').format('MM/YYYY') + ' ';
-        }
-        const isExist = await this.invoiceModel.findOne({
-          'tenant._id': contract.tenant._id,
-          'room._id': contract.room._id,
-          'service._id': contract.room._id,
-          month: date,
-        });
-        if (!isExist) {
-          const invoiceDates = contract.invoiceDetails;
-
-          for (const invoiceDate of invoiceDates) {
-            const isCreateDate = dayjs('2024-11-02').isSame(
-              invoiceDate.date,
-              'day',
-            );
-
-            if (isCreateDate) {
-              const invoiceRent = await this.invoiceModel.create({
-                'room._id': contract.room._id,
-                'room.roomName': contract.room.roomName,
-
-                'tenant._id': contract.tenant._id,
-                'tenant.name': contract.tenant.name,
-                'tenant.idCard': contract.tenant.idCard,
-                'tenant.phone': contract.tenant.phone,
-
-                'service._id': contract.room._id,
-                'service.name': 'Rental',
-                'service.unit': 'month',
-                'service.priceUnit': contract.room.price,
-
-                send: false,
-                amount: contract.room.price * invoiceDate.months,
-                month: date,
-                nextPaymentDate: dayjs().add(contract.rentCycleCount, 'months'),
-                status: 'UNPAID',
-                description: `Rental ${contract.room.roomName} month ${date}`,
-              });
+ 
+  autoCreateInvoiceRent() {
+    const cronExpression = this.configService.get<string>('TIME_CREATE_RENTAL');
+    const job = new CronJob(cronExpression, async () => {
+     
+        let date = '';
+        const today = dayjs().format('YYYY-MM-DD');
+        const contracts = await this.contractService.findContractActive();
+        if (contracts && contracts.length > 0) {
+          for (const contract of contracts) {
+            for (let i = 1; i <= contract.rentCycleCount; i++) {
+              date += dayjs().add(i, 'month').format('MM/YYYY') + ' ';
+            }
+            const isExist = await this.invoiceModel.findOne({
+              'tenant._id': contract.tenant._id,
+              'room._id': contract.room._id,
+              'service._id': contract.room._id,
+              month: date,
+            });
+            if (!isExist) {
+              const invoiceDates = contract.invoiceDetails;
+    
+              for (const invoiceDate of invoiceDates) {
+                const isCreateDate = dayjs('2024-11-02').isSame(
+                  invoiceDate.date,
+                  'day',
+                );
+    
+                if (isCreateDate) {
+                  const invoiceRent = await this.invoiceModel.create({
+                    'room._id': contract.room._id,
+                    'room.roomName': contract.room.roomName,
+    
+                    'tenant._id': contract.tenant._id,
+                    'tenant.name': contract.tenant.name,
+                    'tenant.idCard': contract.tenant.idCard,
+                    'tenant.phone': contract.tenant.phone,
+    
+                    'service._id': contract.room._id,
+                    'service.name': 'Rental',
+                    'service.unit': 'month',
+                    'service.priceUnit': contract.room.price,
+    
+                    send: false,
+                    amount: contract.room.price * invoiceDate.months,
+                    month: date,
+                    nextPaymentDate: dayjs().add(contract.rentCycleCount, 'months'),
+                    status: 'UNPAID',
+                    description: `Rental ${contract.room.roomName} month ${date}`,
+                  });
+                }
+              }
             }
           }
         }
-      }
-    }
+      
+      
+      
+    });
+    this.schedulerRegistry.addCronJob('Auto Create Invoice Rental', job);
+    job.start();
   }
 
   async findAll(currentPage: number, pageSize: number, qs: string) {

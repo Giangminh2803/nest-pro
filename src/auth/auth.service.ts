@@ -5,7 +5,7 @@ import { IUser } from 'src/users/user.interface';
 import { CodeAuthDto, CodeResetPasswordDto, RegisterUserDto } from 'src/users/dto/create-user.dto';
 import { ConfigService } from '@nestjs/config';
 import ms from 'ms';
-import { response, Response } from 'express';
+import { Response } from 'express';
 import { RoleService } from 'src/role/role.service';
 
 
@@ -15,7 +15,7 @@ export class AuthService {
         private configService: ConfigService,
         private usersService: UsersService,
         private jwtService: JwtService,
-        private roleSerivce: RoleService,
+        private roleService: RoleService,
       
 
     ) { }
@@ -28,7 +28,7 @@ export class AuthService {
             const isValid = this.usersService.isValidPassword(password, user.password);
             if (isValid) {
                 const userRole = user.role as unknown as { _id: string, name: string };
-                const temp = await this.roleSerivce.findOne(userRole._id);
+                const temp = await this.roleService.findOne(userRole._id);
 
                 const objUser = {
                     ...user.toObject(),
@@ -54,14 +54,14 @@ export class AuthService {
             email,
             role,
             avatar
-            //permissions,
+           
 
         };
         const refresh_token = this.createRefreshToken(payload);
         await this.usersService.updateUserToken(refresh_token, _id);
 
         const userRole = user.role as unknown as { _id: string, name: string }
-        const temp = await this.roleSerivce.findOne(userRole._id);
+        const temp = await this.roleService.findOne(userRole._id);
         response.cookie('refresh_token', refresh_token, {
             httpOnly: true,
             maxAge: ms(this.configService.get<string>('JWT_REFRESH_EXPIRE'))

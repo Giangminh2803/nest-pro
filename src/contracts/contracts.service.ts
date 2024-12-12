@@ -13,11 +13,12 @@ import { IUser } from 'src/users/user.interface';
 import mongoose from 'mongoose';
 import aqp from 'api-query-params';
 import { Room, RoomDocument } from 'src/rooms/schemas/room.schema';
-import { Cron } from '@nestjs/schedule';
+import { Cron, SchedulerRegistry } from '@nestjs/schedule';
 import dayjs from 'dayjs';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
 import { Invoice, InvoiceDocument } from '../invoices/schemas/invoice.schema';
+import { CronJob } from 'cron';
 
 
 const { ObjectId } = mongoose.Types;
@@ -32,7 +33,12 @@ export class ContractsService {
     @InjectModel(Room.name) private roomModel: SoftDeleteModel<RoomDocument>,
     @InjectModel(Invoice.name)
     private invoiceModel: SoftDeleteModel<InvoiceDocument>,
-  ) {}
+    private schedulerRegistry: SchedulerRegistry,
+    
+  ) {
+    this.autoUpdateStatus();
+    this.autoSendEmailExpire();
+  }
 
   async create(createContractDto: CreateContractDto, user: IUser) {
     const isExist = await this.roomModel.findOne({
@@ -236,52 +242,71 @@ export class ContractsService {
     return await this.contractModel.softDelete({ _id: id });
   }
 
-  @Cron('0 6 * * * *')
-  async autoUpdateStatus() {
-    const today = dayjs().startOf('day');
-    await this.contractModel.updateMany(
-      { endDate: { $lt: today }, status: 'ACTIVE' },
-      {
-        status: 'EXPIRED',
-       
-      },
-    );
-    await this.contractModel.updateMany(
-      { actualEndDate: { $lt: today }, status: 'ACTIVE' },
-      {
-        status: 'CANCEL',
-      },
-    );
-    
+  autoUpdateStatus() {
+    const cronExpression = this.configService.get<string>('TIME_UPDATE_STATUS_CONTRACT');
+    const job = new CronJob(cronExpression, async () => {
+  
+        const today = dayjs().startOf('day');
+        await this.contractModel.updateMany(
+          { endDate: { $lt: today }, status: 'ACTIVE' },
+          {
+            status: 'EXPIRED',
+           
+          },
+        );
+        await this.contractModel.updateMany(
+          { actualEndDate: { $lt: today }, status: 'ACTIVE' },
+          {
+            status: 'CANCEL',
+          },
+        );
+        
+      
+      
+      
+      
+    });
+    this.schedulerRegistry.addCronJob('Auto Update Status', job);
+    job.start();
   }
 
-  @Cron('0 10 * * *')
-  async autoSendEmailExpire() {
-    const expireMonthDown = dayjs().add(45, 'days');
-    const expireMonthUp = dayjs(expireMonthDown).add(1, 'days');
-    const urlFe = this.configService.get<string>('URL_FE') + '/user';
-    const contracts = await this.contractModel.find({
-      endDate: { $gte: expireMonthDown, $lt: expireMonthUp },
-      status: 'ACTIVE',
+  autoSendEmailExpire() {
+    const cronExpression = this.configService.get<string>('TIME_SEND_EXPIRE');
+    const job = new CronJob(cronExpression, async () => {
+  
+           const expireMonthDown = dayjs().add(45, 'days');
+          const expireMonthUp = dayjs(expireMonthDown).add(1, 'days');
+          const urlFe = this.configService.get<string>('URL_FE') + '/user';
+          const contracts = await this.contractModel.find({
+            endDate: { $gte: expireMonthDown, $lt: expireMonthUp },
+            status: 'ACTIVE',
+          });
+          for (const contract of contracts) {
+            await this.mailerService.sendMail({
+              to: contract.tenant.email,
+              from: '"Notice of contract extension" <abc@gmail.com>',
+              subject: 'Contract Renewal',
+              template: 'expireContract.hbs',
+              context: {
+                receiver: contract.tenant.name,
+                startDate: dayjs(contract.startDate).format('DD/MM/YYYY'),
+                endDate: dayjs(contract.endDate).format('DD/MM/YYYY'),
+                location: contract.room.roomName,
+                price:
+                  contract.room.price
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' đ',
+                url: urlFe,
+              },
+            });
+          }
+        
+      
+      
+      
+      
     });
-    for (const contract of contracts) {
-      await this.mailerService.sendMail({
-        to: contract.tenant.email,
-        from: '"Notice of contract extension" <abc@gmail.com>',
-        subject: 'Contract Renewal',
-        template: 'expireContract.hbs',
-        context: {
-          receiver: contract.tenant.name,
-          startDate: dayjs(contract.startDate).format('DD/MM/YYYY'),
-          endDate: dayjs(contract.endDate).format('DD/MM/YYYY'),
-          location: contract.room.roomName,
-          price:
-            contract.room.price
-              .toString()
-              .replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' đ',
-          url: urlFe,
-        },
-      });
-    }
+    this.schedulerRegistry.addCronJob('Auto Send Email Expire', job);
+    job.start();
   }
 }

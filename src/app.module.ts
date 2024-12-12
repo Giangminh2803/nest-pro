@@ -59,6 +59,7 @@ import { RequestsContractModule } from './requests-contract/requests-contract.mo
     MailModule,
     RegisterServiceModule,
     RequestsContractModule,
+    
    
   ],
   controllers: [AppController],
